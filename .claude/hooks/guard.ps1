@@ -111,6 +111,64 @@ if ($tool -in @('Write', 'Edit', 'NotebookEdit', 'MultiEdit')) {
     exit 0
 }
 
+# ---------------------------------------------------------------- DaVinci Resolve (CLAUDE.md rule 7)
+# The studio only ever creates or loads projects named STUDIO_..., never deletes projects, never switches databases
+# or uses cloud projects; every other Resolve call needs a STUDIO_ project created or loaded in this session.
+if ($tool -like 'mcp__davinci-resolve__*') {
+    $short = $tool.Substring('mcp__davinci-resolve__'.Length)
+    $action = [string]$ti.action
+    $params = $ti.params
+    if ($params -is [string] -and $params.Trim().StartsWith('{')) { try { $params = $params | ConvertFrom-Json } catch { } }
+    $stateFile = Join-Path $repo '.claude\hooks\runtime\resolve_studio_project.json'
+    switch ($short) {
+        'resolve_control' { exit 0 }
+        'project_manager_cloud' { Block 'cloud projects are not studio work.' }
+        'project_manager_database' {
+            if ($action -in @('get_current', 'list')) { exit 0 }
+            Block 'the studio never switches Resolve project databases.'
+        }
+        'project_manager_folders' {
+            if ($action -eq 'delete') { Block 'the studio never deletes Resolve project folders.' }
+            exit 0
+        }
+        'project_manager' {
+            if ($action -in @('list', 'list_attributes', 'get_current', 'snapshot')) { exit 0 }
+            if ($action -eq 'delete') { Block 'the studio never deletes Resolve projects.' }
+            $name = ''
+            if ($params) { $name = [string]$params.name }
+            if ($action -in @('create', 'load', 'import_project')) {
+                if ($name -notmatch '^STUDIO_[A-Za-z0-9_]+$') {
+                    Block "the studio creates or opens only projects named STUDIO_<...>, never an existing project ('$name')."
+                }
+                $dir = Split-Path $stateFile
+                New-Item -ItemType Directory -Force -Path $dir | Out-Null
+                $state = @{ session_id = [string]$in.session_id; project = $name; action = $action; at = (Get-Date).ToString('yyyy-MM-ddTHH:mm:sszzz') }
+                [IO.File]::WriteAllText($stateFile, ($state | ConvertTo-Json -Compress), (New-Object System.Text.UTF8Encoding($false)))
+                exit 0
+            }
+            if ($action -in @('export_project', 'archive')) {
+                if ($name -notmatch '^STUDIO_') { Block "the studio exports or archives only its own STUDIO_ projects ('$name')." }
+                $path = ''
+                if ($params) { $path = [string]$params.path }
+                if ($path -and -not (Test-InRoots $path (Get-WriteRoots))) { Block "export path outside the allowed write roots ($path)." }
+                exit 0
+            }
+        }
+    }
+    # Everything else (save, close, timelines, media pool, items, grades, render, ...).
+    $ok = $false
+    if (Test-Path -LiteralPath $stateFile) {
+        try {
+            $st = Get-Content -LiteralPath $stateFile -Raw -Encoding UTF8 | ConvertFrom-Json
+            $ok = ($st.session_id -eq [string]$in.session_id) -and ([string]$st.project -match '^STUDIO_')
+        } catch { }
+    }
+    if (-not $ok) {
+        Block 'first create or load a STUDIO_ project in this session (project_manager create/load); the studio never edits or renders an existing Resolve project.'
+    }
+    exit 0
+}
+
 # ---------------------------------------------------------------- commands and page scripts
 $text = ''
 if ($tool -in @('Bash', 'PowerShell')) { $text = [string]$ti.command }
@@ -133,7 +191,14 @@ if ($isShell) {
         Block '.env files hold secrets and are never read by agents.'
     }
 
-    $writeVerb = '(?i)(>|\b(set-content|add-content|out-file|new-item|ni|copy-item|cp|copy|move-item|mv|move|remove-item|rm|del|erase|rd|rmdir|rename-item|ren|mkdir|md|touch|tee|tee-object|robocopy|xcopy|sed|python|py|node|powershell|pwsh|cmd)\b)'
+    # A verb counts only as a word of its own: not glued to a dot or a dash (CLAUDE.md, x.py, --copy), but an
+    # executable path still counts (.venv/Scripts/python.exe).
+    function VerbRe([string]$list) { return '(?i)(?<![\w.\-])(' + $list + ')(?![\w\-])' }
+    $copyVerbs = 'cp|copy|copy-item|xcopy|robocopy'
+    $targetVerbs = 'set-content|add-content|out-file|new-item|ni|move-item|mv|move|remove-item|rm|del|erase|rd|rmdir|rename-item|ren|mkdir|md|touch|tee|tee-object'
+    $writeVerb = '(?i)(>|' + (VerbRe "$copyVerbs|$targetVerbs|sed|python|py|node|powershell|pwsh|cmd").Substring(4) + ')'
+    # For the write-location check, file commands count only where a command starts (line start, ; & | or ( ).
+    function CmdRe([string]$list) { return '(?im)(^|[;&|(])\s*(' + $list + ')(?![\w\-])' }
     # Approval records: never through a shell write.
     if ($text -match '(?i)00_admin[\\/]+approvals' -and $text -match $writeVerb) {
         Block 'approval records are written only by the record-approval hook from the user''s answer.'
@@ -156,13 +221,13 @@ if ($isShell) {
     }
 
     # Writes outside the allowed roots (best effort: absolute paths in commands that write).
-    if ($text -match $writeVerb) {
+    if ($text -match '>' -or $text -match (CmdRe "$copyVerbs|$targetVerbs")) {
         $roots = Get-WriteRoots
         $targets = @()
         foreach ($m in [regex]::Matches($text, '>>?\s*"?([^\s"|;&]+)')) { $targets += $m.Groups[1].Value }
         $abs = @()
         foreach ($m in [regex]::Matches($text, '(?i)(?<![\w/\\])([a-z]:[\\/][^\s"''|;&<>]*|/[a-z]/[^\s"''|;&<>]*)')) { $abs += $m.Groups[1].Value }
-        if ($text -match '(?i)\b(cp|copy|copy-item|xcopy|robocopy)\b') {
+        if ($text -match (CmdRe $copyVerbs)) {
             # The destination is the -Destination value, else the last plain argument (relative = inside the working directory).
             $toks = @([regex]::Matches($text, '"[^"]*"|''[^'']*''|\S+') | ForEach-Object { $_.Value.Trim('"', "'") })
             $dest = $null
@@ -173,7 +238,7 @@ if ($isShell) {
             }
             if ($dest) { $targets += $dest }
         }
-        elseif ($text -match '(?i)\b(set-content|add-content|out-file|new-item|ni|move-item|mv|move|remove-item|rm|del|erase|rd|rmdir|rename-item|ren|mkdir|md|touch|tee|tee-object)\b') { $targets += $abs }
+        elseif ($text -match (CmdRe $targetVerbs)) { $targets += $abs }
         foreach ($t in $targets) {
             if ($t -match '(?i)^(/dev/null|nul|\$null|&1|&2)$') { continue }
             if (-not ($t -match '(?i)^([a-z]:[\\/]|/[a-z]/)')) { continue }   # relative paths stay in the working directory

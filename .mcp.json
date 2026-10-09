@@ -1,0 +1,14 @@
+{
+  "mcpServers": {
+    "davinci-resolve": {
+      "command": "C:\\Users\\david\\AppData\\Local\\davinci-resolve-mcp\\venv\\Scripts\\python.exe",
+      "args": ["C:\\Users\\david\\AppData\\Local\\davinci-resolve-mcp\\src\\server.py"],
+      "env": {
+        "RESOLVE_SCRIPT_API": "C:\\ProgramData\\Blackmagic Design\\DaVinci Resolve\\Support\\Developer\\Scripting",
+        "RESOLVE_SCRIPT_LIB": "C:\\DavinciResolve\\fusionscript.dll",
+        "PYTHONPATH": "C:\\ProgramData\\Blackmagic Design\\DaVinci Resolve\\Support\\Developer\\Scripting\\Modules",
+        "PYTHONHOME": "C:\\Program Files\\Python312"
+      }
+    }
+  }
+}

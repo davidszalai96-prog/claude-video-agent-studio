@@ -28,7 +28,11 @@ An agentic animation studio on this PC: a Producer and 14 specialist agents plan
    - each project's recorded footage folder;
    - Claude Code's scratch folder (`%TEMP%\claude\…`);
    - this project's memory folder (`~\.claude\projects\C--claude-video-agent-studio\memory`).
-7. **Never open, modify or render an existing DaVinci Resolve project.** Tests use a new project. Never update Resolve past 21.0.x.
+7. **Never open, modify or render an existing DaVinci Resolve project.**
+   - The studio creates and loads only projects named `STUDIO_<...>`, for example `STUDIO_MAG` or `STUDIO_TEST_20261010`.
+   - Every other Resolve call needs such a project created or loaded in the same session (the guard hook enforces this).
+   - It never deletes projects, switches databases or uses cloud projects.
+   - Never update Resolve past 21.0.x.
 8. **The Gemini key** (`C:\CU\output\video\geminiapi.txt`) is read by scripts only, by path. Never print, log, copy or commit it, and never read it with a file tool.
 9. **Never write song lyrics** into any file or reply. Use timing and structure only.
 10. **No dialogue or voice lines in generation prompts.** Sound effects and music are fine.

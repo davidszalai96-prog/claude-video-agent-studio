@@ -267,3 +267,69 @@ def test_questions_without_a_marker_record_nothing(repo):
     code, out, _ = run_hook("record-approval.ps1", ask_payload("Which color?", "Approve"), repo)
     assert code == 0 and out.strip() == ""
     assert not list((repo / "projects" / "MAG" / "00_admin" / "approvals").glob("*.json"))
+
+
+# --- regressions: words glued to dots or dashes are not commands -----------------------------------
+
+@pytest.mark.parametrize("cmd", [
+    "cat >> notes.txt <<'E'\nsee CLAUDE.md and C:/x.drp\nE",
+    "grep -n copy README.md C:/CU/output/video/list.txt",
+    "python tool.py --copy C:/CU/output/video/a.mp4",
+])
+def test_md_and_py_extensions_are_not_write_verbs(repo, cmd):
+    code, _, err = guard(repo, "Bash", {"command": cmd})
+    assert code == 0, err
+
+
+def test_executable_paths_still_count_as_writers(repo):
+    cmd = ".venv/Scripts/python.exe -c \"open('projects/MAG/00_admin/approvals/R-001.json','w')\""
+    assert guard(repo, "Bash", {"command": cmd})[0] == 2
+
+
+# --- DaVinci Resolve (CLAUDE.md rule 7) ----------------------------------------------------------
+
+def resolve(repo, tool, action, params=None, session="s1", agent="finishing"):
+    payload = {"hook_event_name": "PreToolUse", "tool_name": f"mcp__davinci-resolve__{tool}", "session_id": session,
+               "tool_input": {"action": action, "params": params}, "agent_type": agent}
+    return run_hook("guard.ps1", payload, repo)
+
+
+def test_resolve_read_only_and_control_calls_are_allowed(repo):
+    assert resolve(repo, "resolve_control", "get_version")[0] == 0
+    assert resolve(repo, "project_manager", "list")[0] == 0
+    assert resolve(repo, "project_manager", "get_current")[0] == 0
+    assert resolve(repo, "project_manager_database", "get_current")[0] == 0
+    assert resolve(repo, "project_manager_folders", "list")[0] == 0
+
+
+@pytest.mark.parametrize("tool,action,params,expect", [
+    ("project_manager", "load", {"name": "Highscore"}, "never an existing project"),
+    ("project_manager", "create", {"name": "My Film"}, "STUDIO_"),
+    ("project_manager", "delete", {"name": "STUDIO_TEST"}, "never deletes"),
+    ("project_manager", "export_project", {"name": "Highscore", "path": "C:/x.drp"}, "only its own STUDIO_"),
+    ("project_manager_database", "set_current", {"db_info": {"DbType": "Disk", "DbName": "x"}}, "databases"),
+    ("project_manager_cloud", "load", {}, "cloud"),
+    ("project_manager_folders", "delete", {"name": "x"}, "folders"),
+    ("timeline", "list", None, "first create or load a STUDIO_ project"),
+    ("render", "start", None, "first create or load a STUDIO_ project"),
+])
+def test_resolve_refusals(repo, tool, action, params, expect):
+    code, _, err = resolve(repo, tool, action, params)
+    assert code == 2 and expect in err, err
+
+
+def test_resolve_edits_need_a_studio_project_from_this_session(repo):
+    assert resolve(repo, "timeline", "list")[0] == 2
+    assert resolve(repo, "project_manager", "create", {"name": "STUDIO_TEST_20261010"})[0] == 0
+    assert resolve(repo, "timeline", "list")[0] == 0
+    assert resolve(repo, "render", "add_job")[0] == 0
+    assert resolve(repo, "timeline", "list", session="other-session")[0] == 2  # a new session starts closed
+    assert resolve(repo, "project_manager", "load", '{"name": "STUDIO_MAG"}', session="s2")[0] == 0  # params as a JSON string
+    assert resolve(repo, "timeline", "list", session="s2")[0] == 0
+
+
+def test_resolve_export_paths_stay_inside_the_roots(repo):
+    ok = resolve(repo, "project_manager", "export_project", {"name": "STUDIO_MAG", "path": str(repo / "projects" / "x.drp")})
+    assert ok[0] == 0
+    bad = resolve(repo, "project_manager", "export_project", {"name": "STUDIO_MAG", "path": r"C:\Users\david\Desktop\x.drp"})
+    assert bad[0] == 2

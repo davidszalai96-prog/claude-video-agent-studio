@@ -156,7 +156,8 @@ T0 and T1 go straight into the next cut. T2 and up spend GPU time and follow the
 - studio agents changing hooks, settings, agents, `.mcp.json` or the watchdog's files;
 - unmarked or unapproved submits;
 - interrupting ComfyUI or clearing its queue;
-- running the restart script for real, or killing ComfyUI.
+- running the restart script for real, or killing ComfyUI;
+- Resolve calls outside a `STUDIO_<...>` project created or loaded in this session; deleting projects, switching databases, cloud projects.
 
 A blocked call returns "Blocked by studio guardrail: <reason>". Don't work around it. Report it, and ask the Producer, who asks the user.
 

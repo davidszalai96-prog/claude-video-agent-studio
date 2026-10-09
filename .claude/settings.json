@@ -44,12 +44,18 @@
   "hooks": {
     "PreToolUse": [
       {
-        "matcher": "Write|Edit|NotebookEdit|MultiEdit|Bash|PowerShell|mcp__claude-in-chrome__javascript_tool|mcp__Claude_Browser__javascript_tool",
+        "matcher": "^(Write|Edit|NotebookEdit|MultiEdit|Bash|PowerShell|mcp__claude-in-chrome__javascript_tool|mcp__Claude_Browser__javascript_tool|mcp__davinci-resolve__.*)$",
         "hooks": [
           {
             "type": "command",
             "command": "powershell.exe",
-            "args": ["-NoProfile", "-ExecutionPolicy", "Bypass", "-File", "${CLAUDE_PROJECT_DIR}/.claude/hooks/guard.ps1"],
+            "args": [
+              "-NoProfile",
+              "-ExecutionPolicy",
+              "Bypass",
+              "-File",
+              "${CLAUDE_PROJECT_DIR}/.claude/hooks/guard.ps1"
+            ],
             "timeout": 30
           }
         ]
@@ -62,7 +68,13 @@
           {
             "type": "command",
             "command": "powershell.exe",
-            "args": ["-NoProfile", "-ExecutionPolicy", "Bypass", "-File", "${CLAUDE_PROJECT_DIR}/.claude/hooks/record-approval.ps1"],
+            "args": [
+              "-NoProfile",
+              "-ExecutionPolicy",
+              "Bypass",
+              "-File",
+              "${CLAUDE_PROJECT_DIR}/.claude/hooks/record-approval.ps1"
+            ],
             "timeout": 30
           }
         ]

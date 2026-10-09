@@ -11,7 +11,10 @@ description: "Editing, cutting, trimming, pacing, and timeline restructuring in 
   - The user starts Resolve from `C:\DavinciResolve\Resolve.exe`; the MCP's auto-launch only knows `C:\Program Files\…`.
   - In every session, a project must be open, then Workspace ▸ Scripts ▸ resolve_bridge is run once.
 - The 21.1-only surfaces are absent on this build: AddTransition, SetSpeed, SetFades, AddKeyframe and others. Carry those through an imported OTIO (`resolve-music-video` skill).
-- Never open, modify or render an existing project. Tests use a new project (`CLAUDE.md`, rule 7).
+- Never open, modify or render an existing project (`CLAUDE.md`, rule 7).
+  - The studio creates and loads only `STUDIO_<...>` projects.
+  - The guard hook blocks every other Resolve call until one is created or loaded in the session, and it blocks deleting projects, switching databases and cloud projects.
+- The MCP server is in this repo's `.mcp.json`, with the same command and env as Claude Desktop's config.
 - In the studio, only the Finishing & Conform agent uses the Resolve tools.
 - Only the live `davinci-resolve` server is configured here. The Node `davinci-resolve-advanced` server in the table below is not set up on this PC. Its code is in the managed copy (`resolve-advanced\`); ask the user before adding it.
 
