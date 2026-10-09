@@ -169,6 +169,16 @@ Plus `bridge/comfy_api.py` (status, queue, history, free, outputs, logs; no subm
 
 **Step 9: Resolve MCP.** `.mcp.json` with the `davinci-resolve` command and env copied from Claude Desktop's config, including `RESOLVE_SCRIPT_LIB=C:\DavinciResolve\fusionscript.dll`. Then verify with `resolve_control get_version` in a new throwaway project that you open.
 
+*Built and verified 2026-10-10:*
+- `.mcp.json` has the same command and env as Claude Desktop's config. `claude mcp get davinci-resolve` shows it at project scope, "pending approval" until the user approves it on the first `claude` run in this folder.
+- The guard enforces rule 7: the studio creates or loads only `STUDIO_<...>` projects, and every other Resolve call needs one created or loaded in the same session.
+- The user opened a new test project `STUDIO_TEST_20261010` and ran the bridge.
+  - `resolve_control get_version` answered: Resolve 21.0.4.5, MCP 4.8.22. The 25 surfaces absent on this build are all 21.1 additions.
+  - `project_manager get_current` named the test project.
+  - A `timeline list` call was blocked by the guard live, because no `STUDIO_` project had been created or loaded through the MCP in the session.
+- The MCP reports an available update to 4.10.3, which was not applied; updating is the user's decision.
+- The test project stays in Resolve. The studio never deletes projects, so the user can delete it whenever they like.
+
 ## 3. What does not fit this PC, and what I propose
 
 **A. Python.** `python` on PATH is the Microsoft Store alias, and there is no `py` launcher. `C:\Program Files\Python312` (3.12.10) has no packages. ComfyUI's venv (`C:\CUVenv`) has most of what the studio needs, but installing into it could break ComfyUI.
@@ -306,3 +316,18 @@ Your "OK" accepts the proposals as written. Change any of them by number:
 5. ~~Which workflows get manifests (3.H).~~ Decided: you give workflow templates per project, and the Producer prompts for them at project initialization if they're missing.
 7. ~~Footage location (3.G2).~~ Decided: you choose a footage folder for each project when it is defined.
 6. ~~Port four skills now; the h3 split later (3.J).~~ Approved.
+
+## 5. Phase 1 result (2026-10-10)
+
+All nine steps are done and committed locally; nothing is pushed yet. The studio is ready for Phase 2 once the items below are settled.
+
+**Before the first real window:**
+1. **Restart test.** The live restart test (close ComfyUI, wait 15 s, reopen with ComfyUI.bat, API answers) runs once, in a window the user approves, with no job running.
+2. **Smoke tests.** Each workflow template gets a smoke test in an approved window. `sol` has no measured time or VRAM peak yet.
+3. **Approve the Resolve MCP.** The user approves the project-scope `davinci-resolve` server on the first `claude` run in this folder.
+
+**How to start the studio:** from a terminal in this folder, run `claude --agent producer --chrome`. In the Desktop app, use `"agent": "producer"` in `.claude/settings.local.json`. The user opens the studio's ComfyUI tab by typing `http://127.0.0.1:8188` into a tab of Claude's tab group.
+
+**Recommended:** run studio sessions in a normal permission mode, not bypass. The hooks hold in every mode, but the settings' "ask" rules for pushes and guardrail files only prompt outside bypass.
+
+**Phase 2** begins with the pilot project's brief from the user, starting at S0.
