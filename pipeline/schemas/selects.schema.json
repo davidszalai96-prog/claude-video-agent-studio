@@ -1,0 +1,32 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://claude-video-agent-studio.local/schemas/selects.schema.json",
+  "title": "Selects",
+  "description": "Every usable frame range, per project: 06_dailies/selects.json. The edit is built from selects, not takes. Frames are in the take's source file (in inclusive, out exclusive).",
+  "type": "object",
+  "required": ["project", "updated", "selects"],
+  "additionalProperties": false,
+  "properties": {
+    "project": { "$ref": "common.schema.json#/$defs/project_code" },
+    "updated": { "$ref": "common.schema.json#/$defs/timestamp" },
+    "selects": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["select_id", "shot", "take", "frames", "scores", "source"],
+        "additionalProperties": false,
+        "properties": {
+          "select_id": { "$ref": "common.schema.json#/$defs/select_id" },
+          "shot": { "$ref": "common.schema.json#/$defs/shot_id" },
+          "take": { "$ref": "common.schema.json#/$defs/take_id" },
+          "frames": { "$ref": "common.schema.json#/$defs/frame_range" },
+          "scores": { "$ref": "common.schema.json#/$defs/scores" },
+          "hero": { "type": "boolean" },
+          "source": { "$ref": "common.schema.json#/$defs/footage_path" },
+          "status": { "enum": ["available", "in_cut", "superseded"] },
+          "notes": { "type": "string" }
+        }
+      }
+    }
+  }
+}

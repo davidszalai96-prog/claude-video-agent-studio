@@ -1,0 +1,62 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://claude-video-agent-studio.local/schemas/job_spec.schema.json",
+  "title": "Job spec",
+  "description": "One ComfyUI job, written by the Prompt Writer (H3) or the Asset Designer / Storyboard (Krea) to 05_prompts/jobs/<OUTPUT_ID>.json and executed by the Render Wrangler. Only per-job values appear here; everything else comes from the template's default profile.",
+  "type": "object",
+  "required": ["output_id", "project", "kind", "template", "params", "created", "author"],
+  "additionalProperties": false,
+  "properties": {
+    "output_id": { "$ref": "common.schema.json#/$defs/output_id" },
+    "project": { "$ref": "common.schema.json#/$defs/project_code" },
+    "kind": { "$ref": "common.schema.json#/$defs/output_kind" },
+    "template": { "type": "string" },
+    "manifest": { "type": "string" },
+    "attention_profile": { "$ref": "common.schema.json#/$defs/attention_profile" },
+    "params": {
+      "type": "object",
+      "required": ["prompt_file", "seed", "output_prefix"],
+      "additionalProperties": false,
+      "properties": {
+        "prompt_file": { "$ref": "common.schema.json#/$defs/project_path" },
+        "seed": { "type": "integer", "minimum": 0 },
+        "duration_s": { "type": "number", "exclusiveMinimum": 0, "maximum": 30 },
+        "megapixels": { "type": "number", "exclusiveMinimum": 0, "maximum": 4 },
+        "width": { "type": "integer", "minimum": 64 },
+        "height": { "type": "integer", "minimum": 64 },
+        "references": {
+          "type": "array",
+          "maxItems": 9,
+          "items": {
+            "type": "object",
+            "required": ["picture", "file"],
+            "additionalProperties": false,
+            "properties": {
+              "picture": { "type": "integer", "minimum": 1, "maximum": 9, "description": "<Picture N> in the prompt." },
+              "asset": { "$ref": "common.schema.json#/$defs/asset_id" },
+              "file": { "type": "string", "description": "ComfyUI input name (subfolder/name) after upload, or a footage path." },
+              "input": { "type": "string", "description": "Manifest parameter it feeds, e.g. ref_image_0." }
+            }
+          }
+        },
+        "output_prefix": { "type": "string", "pattern": "^(?![A-Za-z]:)(?![/\\\\])(?!.*\\.\\.).+$", "description": "SaveVideo / Image Saver prefix, relative to C:\\CU\\output." }
+      }
+    },
+    "config_changes": { "type": "object", "additionalProperties": { "type": "string" } },
+    "retake_of": { "type": "string", "pattern": "^v\\d{3}$" },
+    "change": {
+      "description": "For a retake: the single variable changed and the diff.",
+      "type": "object",
+      "required": ["variable", "diff"],
+      "additionalProperties": false,
+      "properties": { "variable": { "enum": ["seed", "wording", "reference", "config"] }, "diff": { "type": "string" } }
+    },
+    "lint_report": { "$ref": "common.schema.json#/$defs/project_path" },
+    "created": { "$ref": "common.schema.json#/$defs/timestamp" },
+    "author": { "$ref": "common.schema.json#/$defs/agent" }
+  },
+  "allOf": [
+    { "if": { "properties": { "kind": { "const": "h3" } } }, "then": { "required": ["attention_profile"], "properties": { "params": { "required": ["duration_s"] } } } },
+    { "if": { "properties": { "kind": { "const": "krea" } } }, "then": { "not": { "required": ["attention_profile"] } } }
+  ]
+}

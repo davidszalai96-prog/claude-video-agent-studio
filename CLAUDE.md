@@ -13,7 +13,7 @@ An agentic animation studio on this PC: a Producer and 14 specialist agents plan
    - the **workflow templates**: the saved ComfyUI workflows this project uses. There are no global defaults; if none are named, prompt the user at project initialization;
    - the **footage folder**: where ComfyUI writes this project's takes and stills. It must be inside `C:\CU\output`, because ComfyUI refuses to save anywhere else; `C:\CU\output\studio\<CODE>` is the suggestion.
 
-   The answers are recorded in `projects/<CODE>/00_admin/approvals/policy.json` from the user's own answers. Until a project has a recorded policy, nothing is queued in ComfyUI for it without an approved run ticket whose window is open. Building and reading are always fine; rendering is not.
+   The Producer drafts them in `00_admin/policy_proposal.json`. When the user approves it, a hook records the approval, with a copy of the policy, in `projects/<CODE>/00_admin/approvals/policy.json`. Until a project has a recorded policy, nothing is queued in ComfyUI for it without an approved run ticket whose window is open. Building and reading are always fine; rendering is not.
 3. **Agents never write approvals.**
    - Nothing under `00_admin/approvals/` is written by an agent. A hook records the user's answers there.
    - An agent never claims an approval that isn't recorded.
@@ -74,13 +74,13 @@ projects\<CODE>\        one folder per film, made from the template
 
 ```
 projects\<CODE>\
-  00_admin\    tracker.json, budget.json, run_tickets\, approvals\, notes.md, decisions.md,
-               render_log.jsonl, vram_log.jsonl
+  00_admin\    tracker.json, budget.json, policy_proposal.json, run_tickets\, approvals\ (hook only),
+               tasks\, gates\, notes.md, decisions.md, render_log.jsonl, vram_log.jsonl
   01_brief\    brief.md, project.yaml
   02_story\    song_map.json, concepts.md, treatment.md, beat_sheet.json
   03_art\      style_bible.md, prompt_blocks.json, assets\<asset>\v###\
   04_boards\   shotlist.json, keyframes\, animatic\
-  05_prompts\  <UNIT>_v###.txt, lint\
+  05_prompts\  <UNIT>_v###.txt, lint\, jobs\<OUTPUT_ID>.json
   06_dailies\  <TAKE>\ report.md, qc.json, sheets\
   07_edit\     edl_v###.json, previews\
   08_finish\   conform\, renders\
@@ -102,6 +102,7 @@ A rerun batch outside a film is defined like a project, with its own footage fol
 | Take | `<UNIT>_v###` | `MAG_SQ010_U020_v003` |
 | Select | `<SHOT>_v###_s#` | `MAG_SQ010_U020_SH030_v003_s1` |
 | Asset | `<TYPE>_<name>_v###` with TYPE in CHAR, PROP, ENV, VFX, GFX | `CHAR_nyxara_v002` |
+| Krea still | `<ASSET>_c##` (sheet candidate) or `<SHOT>_kf_v###[_c##]` (keyframe) | `CHAR_nyxara_v002_c03` |
 | Run ticket / note / decision / task | `R-###`, `N-###`, `D-###`, `T-####` | `R-004` |
 
 Versions are always three digits (`v001`). Agents pass each other paths and IDs, never pasted content.

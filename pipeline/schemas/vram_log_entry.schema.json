@@ -1,0 +1,28 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://claude-video-agent-studio.local/schemas/vram_log_entry.schema.json",
+  "title": "VRAM log entry",
+  "description": "One line of 00_admin/vram_log.jsonl (append-only), written by the watchdog and the Render Wrangler.",
+  "type": "object",
+  "required": ["ts", "event"],
+  "additionalProperties": false,
+  "properties": {
+    "ts": { "$ref": "common.schema.json#/$defs/timestamp" },
+    "project": { "$ref": "common.schema.json#/$defs/project_code" },
+    "run_id": { "$ref": "common.schema.json#/$defs/run_id" },
+    "output_id": { "$ref": "common.schema.json#/$defs/output_id" },
+    "event": { "enum": ["window_start", "window_end", "headroom_check", "sample", "peak", "halt_detected", "restart", "restart_failed", "api_down", "comfy_changed"] },
+    "free_gb": { "type": "number", "minimum": 0 },
+    "used_gb": { "type": "number", "minimum": 0 },
+    "total_gb": { "type": "number", "minimum": 0 },
+    "peak_gb": { "type": "number", "minimum": 0 },
+    "required_gb": { "type": "number", "minimum": 0 },
+    "step": { "type": "integer", "minimum": 0 },
+    "total_steps": { "type": "integer", "minimum": 1 },
+    "seconds_since_progress": { "type": "number", "minimum": 0 },
+    "config_hash": { "type": "string" },
+    "attention_profile": { "$ref": "common.schema.json#/$defs/attention_profile" },
+    "restart_count": { "type": "integer", "minimum": 0 },
+    "detail": { "type": "string" }
+  }
+}

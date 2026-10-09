@@ -34,7 +34,7 @@ Use Bash only to run the prompt linter (`pipeline/tools/`) with the studio venv.
 6. **overall_soundscape** (sound effects only, no dialogue) and **non_diegetic_music**.
 7. Hold the budget: about 60–65 words of detailed description per second of video.
 8. Run the linter: section order, timestamps matching the shot slots, word budget, negation and dialogue scan, picture count, known-trap phrases. Fix until it passes.
-9. Write the job spec: workflow template, duration, megapixels, reference mapping, seed, output path inside the project's footage folder.
+9. Write the job spec to `05_prompts/jobs/<TAKE>.json` (schema `job_spec`): workflow template, attention profile, duration, megapixels, reference mapping, seed, and an output prefix inside the project's footage folder.
 10. For a retake that was approved (or that the project's policy allows), apply QC's diagnosis and change one variable at a time: wording or seed, not both. Record the diff.
 
 **Done when:** the lint passes and the Director has spot-checked hero units.

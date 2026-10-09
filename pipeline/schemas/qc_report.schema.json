@@ -1,0 +1,95 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://claude-video-agent-studio.local/schemas/qc_report.schema.json",
+  "title": "QC report",
+  "description": "Dailies & QC's structured verdict on one take: 06_dailies/<TAKE>/qc.json, next to report.md and sheets/.",
+  "type": "object",
+  "required": ["take", "project", "reviewed_at", "technical", "cuts", "blind_pass", "shots", "verdict"],
+  "additionalProperties": false,
+  "properties": {
+    "take": { "$ref": "common.schema.json#/$defs/take_id" },
+    "project": { "$ref": "common.schema.json#/$defs/project_code" },
+    "reviewed_at": { "$ref": "common.schema.json#/$defs/timestamp" },
+    "technical": {
+      "type": "object",
+      "required": ["duration_s", "fps", "frames", "width", "height"],
+      "additionalProperties": false,
+      "properties": {
+        "duration_s": { "type": "number", "minimum": 0 },
+        "fps": { "type": "number", "exclusiveMinimum": 0 },
+        "frames": { "type": "integer", "minimum": 1 },
+        "width": { "type": "integer", "minimum": 1 },
+        "height": { "type": "integer", "minimum": 1 },
+        "audio": { "type": ["object", "null"], "properties": { "codec": { "type": "string" }, "sample_rate": { "type": "integer" }, "channels": { "type": "integer" } } },
+        "black_frames": { "type": "array", "items": { "type": "integer", "minimum": 0 } },
+        "frozen_ranges": { "type": "array", "items": { "$ref": "common.schema.json#/$defs/frame_range" } }
+      }
+    },
+    "cuts": {
+      "type": "object",
+      "required": ["detector", "detected", "verified"],
+      "additionalProperties": false,
+      "properties": {
+        "detector": { "type": "string" },
+        "detected": { "type": "array", "items": { "type": "integer", "minimum": 0 } },
+        "verified": { "type": "array", "items": { "type": "integer", "minimum": 0 }, "description": "Cut frames confirmed on a contact sheet." },
+        "rejected": { "type": "array", "items": { "type": "integer", "minimum": 0 }, "description": "Detections that were motion (whips, tilts, wipes), not cuts." }
+      }
+    },
+    "blind_pass": {
+      "type": "object",
+      "required": ["path", "written_before_prompt"],
+      "additionalProperties": false,
+      "properties": {
+        "path": { "$ref": "common.schema.json#/$defs/project_path" },
+        "written_before_prompt": { "const": true }
+      }
+    },
+    "shots": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["frames", "status", "scores", "usable"],
+        "additionalProperties": false,
+        "properties": {
+          "planned_shot": { "anyOf": [ { "$ref": "common.schema.json#/$defs/shot_id" }, { "type": "null" } ] },
+          "frames": { "$ref": "common.schema.json#/$defs/frame_range" },
+          "intended_s": { "type": "number", "minimum": 0 },
+          "status": { "enum": ["done", "partial", "missing", "contradicted", "unplanned"] },
+          "hero": { "type": "boolean" },
+          "scores": { "$ref": "common.schema.json#/$defs/scores" },
+          "usable": { "type": "boolean" },
+          "selects": { "type": "array", "items": { "$ref": "common.schema.json#/$defs/select_id" } },
+          "notes": { "type": "string" }
+        }
+      }
+    },
+    "gemini": {
+      "type": "object",
+      "required": ["used"],
+      "additionalProperties": false,
+      "properties": {
+        "used": { "type": "boolean" },
+        "question": { "type": "string" },
+        "report": { "$ref": "common.schema.json#/$defs/project_path" },
+        "skipped_reason": { "type": "string" }
+      }
+    },
+    "verdict": { "enum": ["approved", "approved_with_selects", "retake_requested"] },
+    "retake_request": {
+      "type": "object",
+      "required": ["cause", "change", "gpu_min_est"],
+      "additionalProperties": false,
+      "properties": {
+        "cause": { "enum": ["sampling", "prompt", "reference"] },
+        "variable": { "enum": ["seed", "wording", "reference"] },
+        "change": { "type": "string" },
+        "gpu_min_est": { "type": "number", "minimum": 0 },
+        "pickup_shots": { "type": "array", "items": { "$ref": "common.schema.json#/$defs/shot_id" } }
+      }
+    },
+    "durable_findings": { "type": "array", "items": { "type": "string" } }
+  },
+  "if": { "properties": { "verdict": { "const": "retake_requested" } } },
+  "then": { "required": ["retake_request"] }
+}

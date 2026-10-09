@@ -1,0 +1,27 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://claude-video-agent-studio.local/schemas/approval.schema.json",
+  "title": "Approval record",
+  "description": "Written only by the record-approval hook from the user's own answer, into 00_admin/approvals/ (policy.json or R-###.json). Agents never write these. The record binds the answer to the SHA-256 of the file it approved; if that file changes later, the approval no longer holds.",
+  "type": "object",
+  "required": ["kind", "project", "subject", "subject_sha256", "decision", "question", "answer", "answered_at", "recorded_by"],
+  "additionalProperties": false,
+  "properties": {
+    "kind": { "enum": ["policy", "run_ticket"] },
+    "project": { "$ref": "common.schema.json#/$defs/project_code" },
+    "subject": { "$ref": "common.schema.json#/$defs/project_path", "description": "The approved file: 00_admin/policy_proposal.json or 00_admin/run_tickets/R-###.json." },
+    "subject_sha256": { "$ref": "common.schema.json#/$defs/sha256" },
+    "decision": { "enum": ["approved", "rejected"] },
+    "question": { "type": "string" },
+    "answer": { "type": "string" },
+    "answered_at": { "$ref": "common.schema.json#/$defs/timestamp" },
+    "recorded_by": { "const": "hook:record-approval" },
+    "run_id": { "$ref": "common.schema.json#/$defs/run_id" },
+    "window": { "$ref": "common.schema.json#/$defs/window", "description": "The window the user approved, which may differ from the proposal." },
+    "policy": { "$ref": "policy.schema.json", "description": "For kind policy: the approved policy, copied from the proposal." }
+  },
+  "allOf": [
+    { "if": { "properties": { "kind": { "const": "run_ticket" }, "decision": { "const": "approved" } } }, "then": { "required": ["run_id", "window"] } },
+    { "if": { "properties": { "kind": { "const": "policy" }, "decision": { "const": "approved" } } }, "then": { "required": ["policy"] } }
+  ]
+}

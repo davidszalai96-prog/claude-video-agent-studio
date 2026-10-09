@@ -29,6 +29,32 @@ Patterns are in `CLAUDE.md` (Naming). In addition:
 - A take is one render: one prompt version, one seed and one configuration hash. Take `v###` counts renders of that unit; the prompt file carries the same version as the take it was written for.
 - Assets: `CHAR_` character, `PROP_` prop or cutout, `ENV_` environment, `VFX_` effect, `GFX_` graphic overlay. Lowercase names with underscores: `CHAR_nyxara_v002`.
 - Tasks `T-####`, notes `N-###`, decisions `D-###` and run tickets `R-###` are numbered per project by the Producer, never reused.
+- Krea stills:
+  - an asset sheet candidate is `<ASSET>_c##` (`CHAR_nyxara_v002_c03`);
+  - a shot keyframe is `<SHOT>_kf_v###`, plus `_c##` when there are several candidates (`MAG_SQ010_U020_SH030_kf_v001_c02`).
+
+## Where structured files live
+
+| File | Path in `projects/<CODE>/` | Schema in `pipeline/schemas/` |
+| --- | --- | --- |
+| Project definition | `01_brief/project.yaml` | `project` |
+| Tracker | `00_admin/tracker.json` | `tracker` |
+| Budget | `00_admin/budget.json` | `budget` |
+| Task envelope | `00_admin/tasks/T-####.json` | `task_envelope` |
+| Policy proposal | `00_admin/policy_proposal.json` | `policy` |
+| Run ticket (proposal) | `00_admin/run_tickets/R-###.json` | `run_ticket` |
+| Approval records (hook only) | `00_admin/approvals/policy.json`, `R-###.json` | `approval` |
+| Job spec | `05_prompts/jobs/<OUTPUT_ID>.json` | `job_spec` |
+| QC report | `06_dailies/<TAKE>/qc.json` | `qc_report` |
+| Selects | `06_dailies/selects.json` | `selects` |
+| EDL | `07_edit/edl_v###.json` | `edl` |
+| Logs (one JSON per line) | `00_admin/render_log.jsonl`, `vram_log.jsonl` | `render_log_entry`, `vram_log_entry` |
+| Gate review pages | `00_admin/gates/G#_v###.md` | — |
+
+- File names equal the ID inside them.
+- Create a project with `.venv\Scripts\python.exe pipeline\tools\new_project.py create <CODE> --title "<title>"`.
+- Create its footage folder, after the user has approved the policy, with `... new_project.py footage <CODE>`.
+- Planning constants (measured vs assumption) are in `pipeline/constants.json`.
 
 ## Unit statuses
 
@@ -93,14 +119,18 @@ T0 and T1 go straight into the next cut. T2 and up spend GPU time and follow the
 
 ## Run tickets and approvals
 
-- **Project definition.** At intake the user defines three things, recorded in `00_admin/approvals/policy.json` from the user's own answers:
+- **Project definition.** At intake the user defines three things:
   - the approval policy;
   - the workflow templates (saved ComfyUI workflows; there are no global defaults, so prompt for them if they're missing);
   - the footage folder.
 
+  The Producer drafts them in `00_admin/policy_proposal.json` and asks the user to approve that file. The hook then records the approval, with the file's SHA-256 and a copy of the policy, in `00_admin/approvals/policy.json`. Editing the proposal afterwards voids the approval.
+
   Until the record exists, nothing runs in ComfyUI for the project without an approved ticket and an open window. Each template gets a manifest in `pipeline/comfy/manifests/` at project initialization.
 - **Ticket.** The Producer writes a proposed ticket to `00_admin/run_tickets/R-###.json` (schema `run_ticket.schema.json`): the jobs, each workflow and its configuration (changes shown as a diff against the default profile), estimated GPU minutes, VRAM risk, and the proposed window.
-- **Approval.** The Producer asks the user, naming the ticket and the window. The user's answer is recorded by a hook to `00_admin/approvals/R-###.json`. Agents never write anything under `00_admin/approvals/` and never treat a ticket as approved without that record.
+- **Approval.** The Producer asks the user, naming the ticket and the window. A hook records the user's answer to `00_admin/approvals/R-###.json`, bound to the ticket file's SHA-256; editing the ticket afterwards voids the approval.
+  - A ticket never says "approved" itself.
+  - Agents never write anything under `00_admin/approvals/`, and never treat a ticket as approved without a record that still matches.
 - **Window.** Nothing starts after the window ends. A job that cannot finish before the end waits for the next window.
 - **Retakes and pickups** ride along with the next ticket, unless the project's policy allows them inside an approved ticket.
 

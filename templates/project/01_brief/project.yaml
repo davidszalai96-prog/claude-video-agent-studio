@@ -1,0 +1,25 @@
+# Project definition, filled in by the Producer from the intake interview.
+# Approval policy, workflow templates and footage folder are NOT here:
+# they live only in the user-approved 00_admin/approvals/policy.json.
+code: "{{CODE}}"
+title: "{{TITLE}}"
+created: "{{CREATED}}"
+status: draft            # draft -> signed_off (G0) -> wrapped
+kind: {{KIND}}           # film | rerun_batch | test
+fps: null
+runtime_s: null
+deliverables: []         # - {platform, width, height, fps, codec, loudness_lufs, true_peak_db}
+audio:
+  file: null             # absolute path, never on D:
+  excerpt_in_s: null
+  excerpt_out_s: null
+story_idea: null
+style_references: []
+characters: []
+must_haves: []
+no_gos: []
+deadline: null           # YYYY-MM-DD
+gpu_hour_cap: null
+gpu_free_times: null
+review_cadence: null
+editor_route: undecided  # undecided | resolve | video-use

@@ -1,0 +1,41 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://claude-video-agent-studio.local/schemas/budget.schema.json",
+  "title": "Budget",
+  "description": "Planned against used per stage: 00_admin/budget.json, kept by the Producer from the render log. Caps are null until the intake sets them. The Producer escalates at escalate_at of any cap.",
+  "type": "object",
+  "required": ["project", "updated", "escalate_at", "caps", "stages"],
+  "additionalProperties": false,
+  "properties": {
+    "project": { "$ref": "common.schema.json#/$defs/project_code" },
+    "updated": { "$ref": "common.schema.json#/$defs/timestamp" },
+    "escalate_at": { "type": "number", "exclusiveMinimum": 0, "maximum": 1 },
+    "caps": {
+      "type": "object",
+      "required": ["gpu_min", "gemini_requests"],
+      "additionalProperties": false,
+      "properties": {
+        "gpu_min": { "type": ["number", "null"], "minimum": 0 },
+        "gemini_requests": { "type": ["integer", "null"], "minimum": 0 },
+        "retake_requests": { "type": ["integer", "null"], "minimum": 0 }
+      }
+    },
+    "stages": {
+      "type": "object",
+      "propertyNames": { "pattern": "^S(10|[0-9])$" },
+      "additionalProperties": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "gpu_min_planned": { "type": "number", "minimum": 0 },
+          "gpu_min_used": { "type": "number", "minimum": 0 },
+          "gemini_planned": { "type": "integer", "minimum": 0 },
+          "gemini_used": { "type": "integer", "minimum": 0 },
+          "retakes_requested": { "type": "integer", "minimum": 0 },
+          "retakes_approved": { "type": "integer", "minimum": 0 },
+          "retakes_automatic": { "type": "integer", "minimum": 0 }
+        }
+      }
+    }
+  }
+}

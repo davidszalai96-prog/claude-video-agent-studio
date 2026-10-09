@@ -1,0 +1,32 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://claude-video-agent-studio.local/schemas/task_envelope.schema.json",
+  "title": "Task envelope",
+  "description": "Every dispatch from the Producer to a studio agent (design: Data model). Stored as 00_admin/tasks/T-####.json. Paths are relative to projects/<CODE>/.",
+  "type": "object",
+  "required": ["task_id", "agent", "objective", "inputs", "outputs", "acceptance", "budget"],
+  "additionalProperties": false,
+  "properties": {
+    "task_id": { "$ref": "common.schema.json#/$defs/task_id" },
+    "project": { "$ref": "common.schema.json#/$defs/project_code" },
+    "agent": { "$ref": "common.schema.json#/$defs/agent" },
+    "objective": { "type": "string", "minLength": 10 },
+    "inputs": { "type": "array", "items": { "$ref": "common.schema.json#/$defs/project_path" } },
+    "outputs": { "type": "array", "minItems": 1, "items": { "$ref": "common.schema.json#/$defs/project_path" } },
+    "acceptance": { "type": "array", "minItems": 1, "items": { "type": "string", "minLength": 3 } },
+    "depends_on": { "type": "array", "items": { "$ref": "common.schema.json#/$defs/task_id" } },
+    "budget": {
+      "type": "object",
+      "required": ["gpu_min", "gemini_requests", "max_turns"],
+      "additionalProperties": false,
+      "properties": {
+        "gpu_min": { "type": "number", "minimum": 0 },
+        "gemini_requests": { "type": "integer", "minimum": 0 },
+        "max_turns": { "type": "integer", "minimum": 1 }
+      }
+    },
+    "due": { "type": "string" },
+    "escalate_if": { "type": "string" },
+    "created": { "$ref": "common.schema.json#/$defs/timestamp" }
+  }
+}

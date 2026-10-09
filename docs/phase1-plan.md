@@ -65,6 +65,13 @@ C:\CU\output\studio\<CODE>\units\   ComfyUI writes takes here (created in Phase 
 - `templates/project/00_admin … 10_wrap`: `tracker.json`, `budget.json`, `notes.md`, `decisions.md`, `run_tickets/`, empty `render_log.jsonl` and `vram_log.jsonl`, and `01_brief/brief.md` and `project.yaml` skeletons.
 - `pipeline/tools/new_project.py` (template → `projects/<CODE>`), `pipeline/tools/validate.py` (checks a project against the schemas), and `pipeline/constants.json`.
 
+*Built 2026-10-09:*
+- 14 schemas. Beyond the list above: `common` (IDs, timestamps, paths), `policy` (the project definition the user approves), `approval` (hook-written records) and the two log-line formats.
+- Run tickets no longer carry `approved_by`. Approval lives only in a hook-written record bound to the ticket's or policy's SHA-256, so editing an approved file voids the approval.
+- `new_project.py footage` creates a footage folder only from a matching recorded approval, and only inside `C:\CU\output`.
+- `validate.py` adds the cross-file rules the schemas can't express: file names equal IDs, windows are ordered, tickets use only approved templates, per-job policy holds, IDs belong to the project, approvals are not stale, log lines are valid, and no template placeholders are left.
+- 47 tests in `pipeline/tests/`.
+
 **Step 6: ComfyUI bridge, read-only.** List the workflows and build the manifest tooling. A project's workflow templates (3.H) are turned into manifests when the project is initialized. Step 6 proves the tooling read-only on H3regenrunsTest, H3ultRefsTest2 and H3regensElements: it opens each in the studio's ComfyUI tab, converts it with graphToPrompt and writes:
 - `manifests/<id>.json`: per-job parameters with node IDs and input names, seed node, broadcast inputs to wire, the sol and chunking nodes for H3, outputs, measured costs.
 - `profiles/<id>.default.json`: every other value, as you saved it.

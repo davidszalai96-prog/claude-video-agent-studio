@@ -1,0 +1,13 @@
+{
+  "project": "{{CODE}}",
+  "schema_version": 1,
+  "updated": "{{CREATED}}",
+  "tasks": [],
+  "units": [],
+  "shots": [],
+  "takes": [],
+  "stills": [],
+  "assets": [],
+  "notes": [],
+  "decisions": []
+}

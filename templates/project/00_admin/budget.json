@@ -1,0 +1,11 @@
+{
+  "project": "{{CODE}}",
+  "updated": "{{CREATED}}",
+  "escalate_at": 0.8,
+  "caps": {
+    "gpu_min": null,
+    "gemini_requests": null,
+    "retake_requests": null
+  },
+  "stages": {}
+}

@@ -1,0 +1,122 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://claude-video-agent-studio.local/schemas/tracker.schema.json",
+  "title": "Tracker",
+  "description": "The single source of truth for a project: 00_admin/tracker.json, kept by the Producer. Every record carries id, status, owner, timestamps and links to its files; type-specific fields may be added.",
+  "type": "object",
+  "required": ["project", "schema_version", "updated", "tasks", "units", "shots", "takes", "stills", "assets", "notes", "decisions"],
+  "additionalProperties": false,
+  "properties": {
+    "project": { "$ref": "common.schema.json#/$defs/project_code" },
+    "schema_version": { "const": 1 },
+    "updated": { "$ref": "common.schema.json#/$defs/timestamp" },
+    "tasks": { "type": "array", "items": { "$ref": "#/$defs/task" } },
+    "units": { "type": "array", "items": { "$ref": "#/$defs/unit" } },
+    "shots": { "type": "array", "items": { "$ref": "#/$defs/shot" } },
+    "takes": { "type": "array", "items": { "$ref": "#/$defs/take" } },
+    "stills": { "type": "array", "items": { "$ref": "#/$defs/still" } },
+    "assets": { "type": "array", "items": { "$ref": "#/$defs/asset" } },
+    "notes": { "type": "array", "items": { "$ref": "#/$defs/note" } },
+    "decisions": { "type": "array", "items": { "$ref": "#/$defs/decision" } }
+  },
+  "$defs": {
+    "base": {
+      "type": "object",
+      "required": ["id", "status", "owner", "created", "updated"],
+      "properties": {
+        "owner": { "$ref": "common.schema.json#/$defs/agent" },
+        "version": { "type": "string", "pattern": "^v\\d{3}$" },
+        "created": { "$ref": "common.schema.json#/$defs/timestamp" },
+        "updated": { "$ref": "common.schema.json#/$defs/timestamp" },
+        "links": { "type": "array", "items": { "type": "string" } }
+      }
+    },
+    "task": {
+      "allOf": [ { "$ref": "#/$defs/base" } ],
+      "properties": {
+        "id": { "$ref": "common.schema.json#/$defs/task_id" },
+        "status": { "enum": ["planned", "dispatched", "done", "partial", "blocked", "escalated", "cancelled"] },
+        "envelope": { "$ref": "common.schema.json#/$defs/project_path" },
+        "report": { "type": "string" }
+      }
+    },
+    "unit": {
+      "allOf": [ { "$ref": "#/$defs/base" } ],
+      "required": ["attempt"],
+      "properties": {
+        "id": { "$ref": "common.schema.json#/$defs/unit_id" },
+        "status": { "enum": ["planned", "boarded", "prompt_ready", "awaiting_run_approval", "queued", "rendering", "rendered", "halted", "in_dailies", "approved", "approved_with_selects", "retake_requested", "in_edit", "locked"] },
+        "attempt": { "type": "integer", "minimum": 1 },
+        "duration_s": { "type": "number" },
+        "current_take": { "$ref": "common.schema.json#/$defs/take_id" },
+        "shots": { "type": "array", "items": { "$ref": "common.schema.json#/$defs/shot_id" } }
+      }
+    },
+    "shot": {
+      "allOf": [ { "$ref": "#/$defs/base" } ],
+      "properties": {
+        "id": { "$ref": "common.schema.json#/$defs/shot_id" },
+        "status": { "enum": ["planned", "boarded", "covered", "partial", "missing", "in_cut", "post_fix", "omitted"] },
+        "hero": { "type": "boolean" },
+        "best_select": { "$ref": "common.schema.json#/$defs/select_id" }
+      }
+    },
+    "take": {
+      "allOf": [ { "$ref": "#/$defs/base" } ],
+      "properties": {
+        "id": { "$ref": "common.schema.json#/$defs/take_id" },
+        "status": { "enum": ["queued", "rendering", "rendered", "halted", "failed", "in_dailies", "reviewed"] },
+        "run_id": { "$ref": "common.schema.json#/$defs/run_id" },
+        "file": { "$ref": "common.schema.json#/$defs/footage_path" },
+        "sha256": { "$ref": "common.schema.json#/$defs/sha256" },
+        "prompt": { "type": "string" },
+        "seed": { "type": "integer" },
+        "template": { "type": "string" },
+        "config_hash": { "type": "string" },
+        "attention_profile": { "$ref": "common.schema.json#/$defs/attention_profile" },
+        "width": { "type": "integer" }, "height": { "type": "integer" },
+        "fps": { "type": "number" }, "frames": { "type": "integer" },
+        "gpu_min": { "type": "number" }, "peak_vram_gb": { "type": "number" },
+        "qc": { "type": "string" }
+      }
+    },
+    "still": {
+      "allOf": [ { "$ref": "#/$defs/base" } ],
+      "properties": {
+        "id": { "$ref": "common.schema.json#/$defs/still_id" },
+        "status": { "enum": ["queued", "rendering", "rendered", "failed", "candidate", "chosen_by_user", "chosen_by_agent", "rejected"] },
+        "file": { "$ref": "common.schema.json#/$defs/footage_path" },
+        "seed": { "type": "integer" },
+        "retake": { "type": "integer", "minimum": 0 },
+        "template": { "type": "string" }
+      }
+    },
+    "asset": {
+      "allOf": [ { "$ref": "#/$defs/base" } ],
+      "properties": {
+        "id": { "$ref": "common.schema.json#/$defs/asset_id" },
+        "status": { "enum": ["specified", "generating", "candidates", "approved", "rejected", "superseded"] },
+        "chosen_still": { "$ref": "common.schema.json#/$defs/still_id" },
+        "used_by": { "type": "array", "items": { "$ref": "common.schema.json#/$defs/unit_id" } }
+      }
+    },
+    "note": {
+      "allOf": [ { "$ref": "#/$defs/base" } ],
+      "required": ["tier"],
+      "properties": {
+        "id": { "$ref": "common.schema.json#/$defs/note_id" },
+        "status": { "enum": ["open", "in_progress", "closed"] },
+        "tier": { "enum": ["T0", "T1", "T2", "T3", "T4"] },
+        "where": { "type": "string" }
+      }
+    },
+    "decision": {
+      "allOf": [ { "$ref": "#/$defs/base" } ],
+      "properties": {
+        "id": { "$ref": "common.schema.json#/$defs/decision_id" },
+        "status": { "enum": ["recorded", "superseded"] },
+        "by": { "type": "string" }
+      }
+    }
+  }
+}

@@ -1,0 +1,51 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://claude-video-agent-studio.local/schemas/run_ticket.schema.json",
+  "title": "Run ticket (proposal)",
+  "description": "A batch of ComfyUI jobs proposed by the Producer in 00_admin/run_tickets/R-###.json. A ticket never carries its own approval: the user's answer is recorded by a hook in 00_admin/approvals/R-###.json, bound to this file's SHA-256 (approval.schema.json). Editing a ticket after approval voids the approval.",
+  "type": "object",
+  "required": ["run_id", "project", "status", "created", "window", "jobs", "est_total_min", "vram_check"],
+  "additionalProperties": false,
+  "properties": {
+    "run_id": { "$ref": "common.schema.json#/$defs/run_id" },
+    "project": { "$ref": "common.schema.json#/$defs/project_code" },
+    "status": { "enum": ["proposed", "superseded", "closed"] },
+    "created": { "$ref": "common.schema.json#/$defs/timestamp" },
+    "window": { "$ref": "common.schema.json#/$defs/window", "description": "The proposed window; the approval record holds the window the user actually approved." },
+    "jobs": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "required": ["output_id", "kind", "template", "config", "est_min"],
+        "additionalProperties": false,
+        "properties": {
+          "output_id": { "$ref": "common.schema.json#/$defs/output_id" },
+          "kind": { "$ref": "common.schema.json#/$defs/output_kind" },
+          "template": { "type": "string", "description": "Saved ComfyUI workflow name, one of the project's templates." },
+          "manifest": { "type": "string" },
+          "config": { "type": "string", "description": "\"default\" or the name of a changed profile (see config_changes)." },
+          "attention_profile": { "$ref": "common.schema.json#/$defs/attention_profile" },
+          "job_spec": { "$ref": "common.schema.json#/$defs/project_path" },
+          "est_min": { "type": "number", "exclusiveMinimum": 0 },
+          "retake_of": { "type": "string", "pattern": "^v\\d{3}$" },
+          "retake_cause": { "type": "string" },
+          "pickup": { "type": "boolean" }
+        },
+        "allOf": [
+          { "if": { "properties": { "kind": { "const": "h3" } } }, "then": { "required": ["attention_profile"] } },
+          { "if": { "properties": { "kind": { "const": "krea" } } }, "then": { "not": { "required": ["attention_profile"] } } }
+        ]
+      }
+    },
+    "config_changes": {
+      "description": "Per template: parameter -> \"old -> new\", against the template's default profile.",
+      "type": "object",
+      "additionalProperties": { "type": "object", "additionalProperties": { "type": "string" } }
+    },
+    "est_total_min": { "type": "number", "minimum": 0 },
+    "gpu_cap_min": { "type": "number", "minimum": 0, "description": "Cap for automatic retakes inside this ticket, when the project's policy allows them." },
+    "vram_check": { "type": "string" },
+    "notes": { "type": "string" }
+  }
+}

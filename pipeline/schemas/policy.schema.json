@@ -1,0 +1,65 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://claude-video-agent-studio.local/schemas/policy.schema.json",
+  "title": "Project policy",
+  "description": "The rules the user defines when a project is defined: approval policy, workflow templates and footage folder. The Producer drafts it in 00_admin/policy_proposal.json; it takes effect only when the user approves it and a hook copies it into 00_admin/approvals/policy.json (approval.schema.json, kind policy).",
+  "type": "object",
+  "required": ["project", "approvals", "workflow_templates", "footage_folder"],
+  "additionalProperties": false,
+  "properties": {
+    "project": { "$ref": "common.schema.json#/$defs/project_code" },
+    "approvals": {
+      "type": "object",
+      "required": ["h3", "stills", "other"],
+      "additionalProperties": false,
+      "properties": {
+        "h3": {
+          "type": "object",
+          "required": ["mode", "auto_retakes_per_unit"],
+          "additionalProperties": false,
+          "properties": {
+            "mode": { "enum": ["batch_window", "per_job"], "description": "batch_window: the user approves a ticket (jobs + window); per_job: a ticket holds exactly one job." },
+            "auto_retakes_per_unit": { "type": "integer", "minimum": 0, "description": "Retakes the studio may run inside an approved ticket without asking, within its GPU cap." }
+          }
+        },
+        "stills": {
+          "type": "object",
+          "required": ["mode", "max_retakes", "only_when_idle", "user_choice"],
+          "additionalProperties": false,
+          "properties": {
+            "mode": { "enum": ["none", "batch_window", "same_as_h3"], "description": "none: stills from still templates run without a ticket." },
+            "max_retakes": { "type": "integer", "minimum": 0 },
+            "only_when_idle": { "type": "boolean", "description": "Queue a still only when ComfyUI's queue is empty and no H3 job runs; one at a time." },
+            "user_choice": { "enum": ["async_agent_fallback", "wait_for_user"], "description": "async_agent_fallback: candidates go to the user, generation continues, the agent chooses if the user hasn't when the still is needed." }
+          }
+        },
+        "other": {
+          "type": "object",
+          "required": ["mode"],
+          "additionalProperties": false,
+          "properties": { "mode": { "enum": ["batch_window", "per_job"] } }
+        }
+      }
+    },
+    "workflow_templates": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "required": ["role", "name"],
+        "additionalProperties": false,
+        "properties": {
+          "role": { "enum": ["h3", "krea", "upscale", "other"] },
+          "name": { "type": "string", "description": "Saved workflow name in C:\\CU\\user\\default\\workflows, without .json." },
+          "manifest": { "type": "string" },
+          "default_attention_profile": { "$ref": "common.schema.json#/$defs/attention_profile" }
+        },
+        "if": { "properties": { "role": { "const": "h3" } } },
+        "then": { "required": ["default_attention_profile"] },
+        "else": { "not": { "required": ["default_attention_profile"] } }
+      }
+    },
+    "footage_folder": { "$ref": "common.schema.json#/$defs/footage_path" },
+    "notes": { "type": "string" }
+  }
+}

@@ -1,0 +1,27 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://claude-video-agent-studio.local/schemas/render_log_entry.schema.json",
+  "title": "Render log entry",
+  "description": "One line of 00_admin/render_log.jsonl (append-only), written by the Render Wrangler for every job event.",
+  "type": "object",
+  "required": ["ts", "project", "output_id", "kind", "event"],
+  "additionalProperties": false,
+  "properties": {
+    "ts": { "$ref": "common.schema.json#/$defs/timestamp" },
+    "project": { "$ref": "common.schema.json#/$defs/project_code" },
+    "run_id": { "$ref": "common.schema.json#/$defs/run_id" },
+    "output_id": { "$ref": "common.schema.json#/$defs/output_id" },
+    "kind": { "$ref": "common.schema.json#/$defs/output_kind" },
+    "event": { "enum": ["queued", "started", "completed", "registered", "failed", "halted", "skipped", "retried"] },
+    "prompt_id": { "type": "string" },
+    "template": { "type": "string" },
+    "manifest": { "type": "string" },
+    "config_hash": { "type": "string" },
+    "attention_profile": { "$ref": "common.schema.json#/$defs/attention_profile" },
+    "file": { "$ref": "common.schema.json#/$defs/footage_path" },
+    "sha256": { "$ref": "common.schema.json#/$defs/sha256" },
+    "gpu_min": { "type": "number", "minimum": 0 },
+    "peak_vram_gb": { "type": "number", "minimum": 0 },
+    "reason": { "type": "string" }
+  }
+}

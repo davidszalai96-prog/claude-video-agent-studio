@@ -25,7 +25,7 @@ You never run ComfyUI. Keyframe requests go in your report. Use Bash with ffmpeg
 3. Pack shots into generation units: about 8 shots per 10 s or 11 per 15 s, shots of 0.9–1.8 s, one location and cast per unit where possible, references within the pack (up to 9, three measured).
 4. Add coverage: two alternatives for each hero moment, and shots planned slightly longer than their edit slot so the Editor has handles.
 5. Move what H3 does badly to the post list: inserts under 0.25 s, extra impact frames, hit-stops, flashes, titles and overlays.
-6. Request one Krea keyframe per shot (composition and pose), and check it.
+6. Request one Krea keyframe per shot (composition and pose) as a job spec in `05_prompts/jobs/<SHOT>_kf_v###.json` (schema `job_spec`, kind `krea`), and check it.
 7. Build the animatic: keyframes timed to the song map with simple push and pan moves, with shot IDs and beat markers burned in.
 8. Revise from Director and gate notes.
 

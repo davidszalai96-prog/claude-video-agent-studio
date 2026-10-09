@@ -1,0 +1,73 @@
+{
+  "about": "Planning constants. 'measured' values come from the skills and docs/notes; 'assumption' values are planning guesses until the pilot measures them. The Librarian updates this file after each project, with evidence.",
+  "updated": "2026-10-09",
+  "h3": {
+    "fps": 24,
+    "frames_formula": "max(5, round(s*24)) + (5 - max(5, round(s*24)) % 17) % 17",
+    "frames_examples": { "10": 242, "15": 362 },
+    "words_per_second": { "value": [60, 65], "status": "measured", "source": "h3-gacha-pipeline §5" },
+    "shots_per_unit": { "value": { "10": 8, "15": 11 }, "status": "measured", "source": "h3-gacha-pipeline §6" },
+    "shot_length_s": { "value": [0.9, 1.8], "status": "measured", "source": "h3-gacha-pipeline §5" },
+    "max_pictures": 9,
+    "measured_pictures": 3,
+    "configs": [
+      {
+        "id": "sage_0.98mp_15s_1ref", "template": "H3regenrunsTest", "attention_profile": "sage",
+        "megapixels": 0.98, "resolution": [1344, 768], "duration_s": 15, "refs": 1, "steps": 28,
+        "minutes": [22, 28.5], "seconds_per_step": [45, 62], "peak_vram_gb": null,
+        "status": "measured", "source": "h3-gacha-pipeline §4"
+      },
+      {
+        "id": "sage_1.5mp_10s_3ref_max", "template": "H3ultRefsTest", "attention_profile": "sage",
+        "megapixels": 1.5, "resolution": [1664, 928], "duration_s": 10, "refs": 3, "ref_image_size": "max", "steps": 28,
+        "minutes": [33, 33], "seconds_per_step": [70, 70], "peak_vram_gb": null,
+        "status": "measured", "source": "h3-gacha-pipeline §4"
+      },
+      {
+        "id": "chunked_1.5mp_10s_3ref_max", "template": "H3ultRefsTest2", "attention_profile": "chunked",
+        "megapixels": 1.5, "duration_s": 10, "refs": 3, "minutes": null, "peak_vram_gb": null,
+        "status": "unmeasured", "source": "h3-gacha-pipeline §4 (check the timing on the first run)"
+      },
+      {
+        "id": "sol_default", "attention_profile": "sol", "minutes": null, "peak_vram_gb": null,
+        "status": "unmeasured", "source": "user decision 2026-10-09; plan with planning.unmeasured_h3_minutes until measured"
+      }
+    ]
+  },
+  "krea": {
+    "seconds_per_image": { "value": [35, 38], "status": "measured at 1080p; re-measure at 2560x1440", "source": "h3-gacha-pipeline §7" },
+    "resolution": [2560, 1440],
+    "seeds_per_sheet": [3, 4],
+    "seeds_per_keyframe": 2
+  },
+  "planning": {
+    "unmeasured_h3_minutes": { "value": 33, "status": "assumption", "note": "upper bound of the measured configurations" },
+    "h3_units_per_hour": { "value": 2, "status": "assumption" },
+    "generated_per_used_seconds": { "value": [2, 3], "status": "assumption" },
+    "first_pass_yield": { "value": 0.6, "status": "assumption" },
+    "retake_and_pickup_margin": { "value": 0.3, "status": "assumption" },
+    "average_shot_s": { "value": [1.3, 1.5], "status": "assumption" }
+  },
+  "gemini": {
+    "default_model": "gemini-3.8-flash",
+    "tokens_per_15s_clip_at_6fps": 25000,
+    "free_tier": { "requests_per_min": 5, "requests_per_day": 20, "tokens_per_min": 250000 },
+    "max_videos_per_request": 10,
+    "max_inline_request_mb": 100,
+    "timing_error_ms": { "median": 142, "max": 208, "direction": "early or exact" },
+    "status": "measured", "source": "docs/notes/resolve-setup-and-pipeline-test.md §4-5"
+  },
+  "editing": {
+    "zoom_pulse": { "downbeat": 1.15, "kick": 1.10, "backbeat": 1.06, "decay_per_frame": 0.6 },
+    "upscale_flag_factor": { "value": 1.5, "status": "assumption (proposed threshold)" },
+    "resolve_render_audio_offset_ms": { "value": 51, "status": "measured", "note": "use a WAV of the song on the timeline for frame-exact work" },
+    "scenedetect": { "adaptive_detector_recall": "8/9 cuts, 0 false positives", "content_detector_false_positives": "5 of 14" }
+  },
+  "qc": {
+    "usable_min_score": 3,
+    "hero_min_intent_and_fidelity": 4,
+    "max_flashes_per_second": 3,
+    "impact_frame_scan": { "max_mean_saturation": 40, "min_extreme_pixel_share": 0.6 }
+  },
+  "budget": { "escalate_at": 0.8 }
+}

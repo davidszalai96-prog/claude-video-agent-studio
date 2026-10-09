@@ -1,0 +1,54 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://claude-video-agent-studio.local/schemas/project.schema.json",
+  "title": "Project definition",
+  "description": "01_brief/project.yaml, written by the Producer from the intake interview. Fields are null until answered; status becomes signed_off at G0. Approval policy, workflow templates and footage folder are NOT here: they live only in the user-approved 00_admin/approvals/policy.json.",
+  "type": "object",
+  "required": ["code", "title", "created", "status", "deliverables", "runtime_s", "audio", "fps"],
+  "additionalProperties": false,
+  "properties": {
+    "code": { "$ref": "common.schema.json#/$defs/project_code" },
+    "title": { "type": "string", "minLength": 1 },
+    "created": { "$ref": "common.schema.json#/$defs/timestamp" },
+    "status": { "enum": ["draft", "signed_off", "wrapped"] },
+    "kind": { "enum": ["film", "rerun_batch", "test"] },
+    "fps": { "type": ["number", "null"], "exclusiveMinimum": 0 },
+    "runtime_s": { "type": ["number", "null"], "exclusiveMinimum": 0 },
+    "deliverables": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["platform", "width", "height"],
+        "additionalProperties": false,
+        "properties": {
+          "platform": { "type": "string" },
+          "width": { "type": "integer", "minimum": 1 },
+          "height": { "type": "integer", "minimum": 1 },
+          "fps": { "type": "number" },
+          "codec": { "type": "string" },
+          "loudness_lufs": { "type": "number" },
+          "true_peak_db": { "type": "number" }
+        }
+      }
+    },
+    "audio": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "file": { "anyOf": [ { "$ref": "common.schema.json#/$defs/abs_path" }, { "type": "null" } ] },
+        "excerpt_in_s": { "type": ["number", "null"], "minimum": 0 },
+        "excerpt_out_s": { "type": ["number", "null"], "minimum": 0 }
+      }
+    },
+    "story_idea": { "type": ["string", "null"] },
+    "style_references": { "type": "array", "items": { "type": "string" } },
+    "characters": { "type": "array", "items": { "type": "string" } },
+    "must_haves": { "type": "array", "items": { "type": "string" } },
+    "no_gos": { "type": "array", "items": { "type": "string" } },
+    "deadline": { "anyOf": [ { "$ref": "common.schema.json#/$defs/date" }, { "type": "null" } ] },
+    "gpu_hour_cap": { "type": ["number", "null"], "minimum": 0 },
+    "gpu_free_times": { "type": ["string", "null"] },
+    "review_cadence": { "type": ["string", "null"] },
+    "editor_route": { "enum": ["undecided", "resolve", "video-use"] }
+  }
+}
