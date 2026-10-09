@@ -326,7 +326,10 @@ All nine steps are done and committed locally; nothing is pushed yet. The studio
 2. **Smoke tests.** Each workflow template gets a smoke test in an approved window. `sol` has no measured time or VRAM peak yet.
 3. **Approve the Resolve MCP.** The user approves the project-scope `davinci-resolve` server on the first `claude` run in this folder.
 
-**How to start the studio:** from a terminal in this folder, run `claude --agent producer --chrome`. In the Desktop app, use `"agent": "producer"` in `.claude/settings.local.json`. The user opens the studio's ComfyUI tab by typing `http://127.0.0.1:8188` into a tab of Claude's tab group.
+**How to start the studio:** double-click `Start_Studio.cmd` (added 2026-10-10).
+- It starts ComfyUI if it isn't running, starts Chrome, puts the studio-tab address on the clipboard, optionally starts Resolve, and runs `claude --agent producer --chrome` here.
+- The Resolve bridge still needs the user: open a `STUDIO_` project, then Workspace > Scripts > resolve_bridge.
+- The studio tab can't be opened by the launcher. The extension only controls tabs in its own tab group, and ComfyUI refuses navigations started by the extension. So the user pastes the address into the group's tab when the studio asks. In the Desktop app, use `"agent": "producer"` in `.claude/settings.local.json`. The user opens the studio's ComfyUI tab by typing `http://127.0.0.1:8188` into a tab of Claude's tab group.
 
 **Recommended:** run studio sessions in a normal permission mode, not bypass. The hooks hold in every mode, but the settings' "ask" rules for pushes and guardrail files only prompt outside bypass.
 

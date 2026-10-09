@@ -92,6 +92,7 @@ def test_studio_agents_cannot_edit_guardrails_but_the_build_session_can(repo):
     "echo hi > C:\\Windows\\Temp\\x.txt", "Set-Content -Path C:\\Users\\david\\Desktop\\x.txt -Value 1",
     "cp projects/x.json C:/CU/user/default/workflows/x.json",
     "curl -X POST http://127.0.0.1:8188/interrupt",
+    "cmd /c Start_Studio.cmd",
     "curl -X POST http://127.0.0.1:8188/api/queue -d '{\"clear\": true}'",
 ])
 def test_blocked_commands(repo, cmd):
@@ -108,6 +109,7 @@ def test_blocked_commands(repo, cmd):
     "echo hi > projects/notes.txt", "python x.py 2>/dev/null", "cp C:/CU/output/video/a.mp4 projects/MAG/x.mp4",
     "curl http://127.0.0.1:8188/api/queue", ".venv/Scripts/python.exe pipeline/comfy/bridge/comfy_api.py status",
     "curl -s https://example.com/d/file",
+    "cmd /c Start_Studio.cmd /dryrun",
 ])
 def test_allowed_commands(repo, cmd):
     code, _, err = guard(repo, "Bash", {"command": cmd})

@@ -204,6 +204,7 @@ if ($isShell) {
         Block 'approval records are written only by the record-approval hook from the user''s answer.'
     }
     if ($text -match '(?i)ticket\.py\s+approve') { Block 'ticket.py approve is for the user''s own terminal only.' }
+    if ($text -match '(?i)Start_Studio\.cmd' -and $text -notmatch '(?i)/dryrun') { Block 'Start_Studio.cmd is the user''s launcher; only its /dryrun may be run by agents.' }
 
     # Guardrail files: studio agents may not change them through the shell either.
     if ($isStudioAgent -and $text -match '(?i)(\.claude[\\/]+(hooks|settings|agents)|\.mcp\.json|restart_comfyui\.ps1|watchdog[\\/]+(config|comfyui_launch)\.json)' -and

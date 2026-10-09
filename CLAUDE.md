@@ -119,4 +119,13 @@ Versions are always three digits (`v001`). Agents pass each other paths and IDs,
 
 ## Launching the studio (after Phase 1)
 
-`claude --agent producer --chrome` from a terminal in this folder. In the Desktop app, use `"agent": "producer"` in `.claude/settings.local.json`. Phase 1 itself is built in a normal session.
+Double-click `Start_Studio.cmd`. It:
+- starts ComfyUI with ComfyUI.bat if nothing serves port 8188;
+- starts Chrome;
+- puts `http://127.0.0.1:8188` on the clipboard for the studio tab;
+- optionally starts Resolve;
+- runs `claude --agent producer --chrome` in this folder.
+
+`Start_Studio.cmd /dryrun` only shows what it would do. Agents may run only the dry run.
+
+The manual equivalent is `claude --agent producer --chrome` from a terminal in this folder. In the Desktop app, use `"agent": "producer"` in `.claude/settings.local.json`. Phase 1 itself is built in a normal session.
