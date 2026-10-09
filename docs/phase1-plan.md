@@ -138,7 +138,7 @@ Plus `bridge/comfy_api.py` (status, queue, history, free, outputs, logs; no subm
 **G. Write allowlist.** The design allows writes only to the repo and `C:\CU\output\studio`. That would also block Claude Code's own scratch folder (`%TEMP%\claude\…`) and this project's memory folder (`~\.claude\projects\C--claude-video-agent-studio\memory`).
 *Approved 2026-10-09:* allow those two as well. The hooks also guard the Gemini key file, which the KICKOFF rules require but step 8 doesn't list.
 
-**H. Workflows (open, see the expansion below).** All three named workflows are present (last saved 5 Oct). Newer H3 workflows exist too: H3ultRefsTest3, H3ultSingleRef, H3ultSingleRefSparse, H3ult_Solenne_v3–v5 and H3ult_Xiaoyu_v1–v3.
+**H. Workflows (decided 2026-10-09, see the end of this section).** All three named workflows are present (last saved 5 Oct). Newer H3 workflows exist too: H3ultRefsTest3, H3ultSingleRef, H3ultSingleRefSparse, H3ult_Solenne_v3–v5 and H3ult_Xiaoyu_v1–v3.
 
 What a manifest is: for one saved workflow, it lists which values the studio may change per job (prompt, reference images, seed, duration, output path) and declares every other value to be yours. It also records how long the configuration takes and how much VRAM it needs. Only workflows with a manifest can be used by the studio.
 
@@ -158,7 +158,15 @@ Points for you:
 - The newest setup turns BlockSparseAttention (sol-attn) on. Standing rule 1 in h3-gacha-pipeline says not to use sol-attn for high-motion work. Which one is current?
 - The newest setup has no measured time or VRAM peak in the docs. Today's ComfyUI logs show two runs with the pruned model (17:40 and 17:45). Neither finished: the first was interrupted, and the second log stops after the model load, before ComfyUI was restarted at 18:00.
 - A manifest is per configuration, not per file: the H3ultRefsTest3 and SingleRef files would be jobs on an existing manifest, not new workflows.
-- *Recommendation:* in step 6, write manifests for H3regensElements, H3regenrunsTest and H3ultRefsTest2 as KICKOFF says, plus H3ult_Xiaoyu_v3_textcats as the newest setup if you use it for production. Each new configuration is marked unmeasured until a smoke test in an approved window measures it.
+*Decided 2026-10-09:*
+- H3regensElements, H3regenrunsTest and H3ultRefsTest2 are the **default** workflows, and step 6 writes their manifests and default profiles.
+- You can request any change at any time:
+  - a different value in a default (it shows as a diff against the default profile in the next run request);
+  - another workflow for a project or a job;
+  - a new default.
+- For a workflow that has no manifest yet, the Pipeline TD first writes one from your saved file. It is marked unmeasured until a smoke test in an approved window measures it.
+- The Producer's intake asks which workflows a project should use, and offers the defaults.
+- Standing rule 1 in h3-gacha-pipeline (no sol-attn for high-motion work) stays as written until you change it. The sparse/pruned setup (Solenne_v5, Xiaoyu_v3) is available on request like any other workflow.
 
 **I. ComfyUI launcher.** It is `C:\Users\david\Desktop\ComfyUI.bat`: vcvars64, then `C:\CUVenv`, then `python main.py --cuda-device 0 --disable-pinned-memory --disable-comfy-compiler`. Other launchers sit next to it (ComfyUINSFW.bat, "ComfyUI - LTX2.bat" and others), and a restart always reopens with ComfyUI.bat.
 *Proposal:* at the start of a window the watchdog compares the running ComfyUI's command line with ComfyUI.bat's and warns you if they differ. "Close ComfyUI" means the python.exe listening on 8188 plus its parent cmd.exe console, and nothing else.
@@ -192,5 +200,5 @@ Your "OK" accepts the proposals as written. Change any of them by number:
 2. ~~Approval policy (3.F).~~ Decided: you define it per project at intake.
 3. ~~The write allowlist plus scratch and memory folders (3.G).~~ Approved.
 4. ~~A dedicated studio ComfyUI tab (3.D).~~ Approved. Jobs run in that tab, so that is where you watch progress and the preview node.
-5. Which workflows get manifests (3.H): open.
+5. ~~Which workflows get manifests (3.H).~~ Decided: the three are defaults, and you can request any change.
 6. ~~Port four skills now; the h3 split later (3.J).~~ Approved.
