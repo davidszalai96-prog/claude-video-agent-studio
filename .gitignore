@@ -1,0 +1,35 @@
+# Secrets
+.env
+*.key
+geminiapi.txt
+*api*key*.txt
+
+# Local Claude Code settings
+.claude/settings.local.json
+
+# Media never goes into git
+*.mp4
+*.mov
+*.mkv
+*.webm
+*.wav
+*.mp3
+*.flac
+*.aac
+*.png
+*.jpg
+*.jpeg
+*.webp
+*.exr
+*.gif
+
+# Project working data (renders, previews, caches)
+projects/*/06_dailies/**/sheets/
+projects/*/07_edit/previews/
+projects/*/08_finish/renders/
+projects/*/09_delivery/
+
+# Python
+__pycache__/
+*.pyc
+.venv/
