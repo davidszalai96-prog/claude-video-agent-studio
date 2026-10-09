@@ -3,7 +3,17 @@ name: "resolve-edit"
 description: "Editing, cutting, trimming, pacing, and timeline restructuring in the DaVinci Resolve MCP. Apply when duplicating/moving clips, copying ranges, building variants, tightening or restructuring a cut, editing selects, or generating an editorial changelist/turnover — live in a running Resolve OR offline against .drt timeline files."
 ---
 
-> Adapted from `samuelgursky/davinci-resolve-mcp` (MIT), `.claude/skills/resolve-edit`. The docs it points to (`docs/...`, `resolve-advanced/README.md`) are in that repo and in the MCP's managed install copy on the user's PC. One correction is applied for Resolve 21.1 (see "Speed, fades and transitions on 21.1+").
+> Adapted from `samuelgursky/davinci-resolve-mcp` (MIT), `.claude/skills/resolve-edit`. The docs it points to (`docs/...`, `resolve-advanced/README.md`) are in that repo and in the MCP's managed install copy on this PC, `C:\Users\david\AppData\Local\davinci-resolve-mcp\` (for example `docs\guides\editorial-decision-guide.md`, `docs\kernels\timeline-edit-kernel.md`, `docs\reference\`). One correction is applied for Resolve 21.1 (see "Speed, fades and transitions on 21.1+").
+
+## On this PC
+
+- Resolve **21.0.4.5 free** at `C:\DavinciResolve`, with MCP 4.8.22 over the free-edition bridge.
+  - The user starts Resolve from `C:\DavinciResolve\Resolve.exe`; the MCP's auto-launch only knows `C:\Program Files\…`.
+  - In every session, a project must be open, then Workspace ▸ Scripts ▸ resolve_bridge is run once.
+- The 21.1-only surfaces are absent on this build: AddTransition, SetSpeed, SetFades, AddKeyframe and others. Carry those through an imported OTIO (`resolve-music-video` skill).
+- Never open, modify or render an existing project. Tests use a new project (`CLAUDE.md`, rule 7).
+- In the studio, only the Finishing & Conform agent uses the Resolve tools.
+- Only the live `davinci-resolve` server is configured here. The Node `davinci-resolve-advanced` server in the table below is not set up on this PC. Its code is in the managed copy (`resolve-advanced\`); ask the user before adding it.
 
 # Resolve Timeline Edit
 Bridges editorial *craft* to this repo's *tools*. Open the right manual; don't

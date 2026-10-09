@@ -7,41 +7,64 @@ description: "Plan, prompt and run MiniMax H3 gacha-style videos end to end in t
 
 End-to-end procedure for the user's MiniMax H3 work: rewriting prompts into the official full-reference (ref2va) format, directing Wuthering Waves / Honkai: Star Rail-style showcases and ultimate-ability sequences, generating reference element sheets with Krea 2, queuing ComfyUI workflows over the API, checking results, and tracking batches. It is meant to run unattended once a pipeline is approved, so follow it closely and record new findings in the project docs.
 
-Project docs (claude.ai project "Minimax H3 Prompts") hold the running state: `claude/reruns-batch-procedure.md` (batch status table), `claude/ult-sequence-research.md` (ultimate research and tests), `claude/h3-prompting-notes.md` (older H3 lessons). Read the relevant one before starting and update it when something new is learned.
+Running state:
+- **Studio work** keeps its state in the project folder (tracker, render log, dailies) under the `studio-conventions` skill.
+- **Standalone gacha work** keeps it in the claude.ai project "Minimax H3 Prompts", which is not on this PC: `claude/reruns-batch-procedure.md` (batch status table), `claude/ult-sequence-research.md` (ultimate research and tests) and `claude/h3-prompting-notes.md` (older H3 lessons).
+
+Record new H3 findings in `docs/notes/` in this repo.
 
 ## 1. Environment
 
-- ComfyUI root is `C:\CU` on the user's PC. Output is `C:\CU\output`, workflows are `C:\CU\user\default\workflows`, inputs are `C:\CU\input`. ComfyUI 0.37, RTX 5090 (32 GB), 128 GB RAM.
-- Drive ComfyUI through Claude's built-in browser at `http://127.0.0.1:8188`, running JavaScript in the page against ComfyUI's own HTTP API. Don't click the canvas.
-- Read and write files with the device file tools (list, stage, commit). There is no shell on the PC, so files and folders can't be moved, renamed or deleted. Don't attempt workarounds through other apps' dialogs; report what needs renaming instead.
-- Gemini video review is available through the `gemini-video-review` skill. The key is in `C:\CU\output\video\geminiapi.txt` (an `AQ.` key). Stage it, extract it to a private temp file without printing it, pass `--key-file`, and delete the temp file afterwards. 503 "high demand" is common: wait 10+ minutes and retry the same request.
+- ComfyUI root is `C:\CU` on the user's PC. Output is `C:\CU\output`, workflows are `C:\CU\user\default\workflows`, inputs are `C:\CU\input`. ComfyUI 0.37, RTX 5090 (32 GB), 128 GB RAM. ComfyUI runs in its own venv `C:\CUVenv`, started by `C:\Users\david\Desktop\ComfyUI.bat`; never install into that venv.
+- **Converting and queuing.** Drive ComfyUI through Claude in Chrome (Claude Code started with `--chrome`) on the **studio's own ComfyUI tab** at `http://127.0.0.1:8188`, running JavaScript in the page against ComfyUI's own HTTP API.
+  - Never use or reload the user's own ComfyUI tab.
+  - Don't click the canvas.
+  - Jobs are queued from that tab with its own client ID, so the user can watch progress and the preview node there.
+- **Monitoring** runs from the shell against the same HTTP API, which keeps working if the browser connection goes idle. The details are in the `comfy-bridge` skill.
+- **Files.** Claude Code has a local shell and reads and writes files directly on disk.
+  - Writes are allowed only in this repo and in `C:\CU\output\studio` (`CLAUDE.md`, rule 6).
+  - Never move or rename the user's folders (rule 9 below).
+- **Gemini.** Video review is available through the `gemini-video-review` skill. The key is in `C:\CU\output\video\geminiapi.txt` (an `AQ.` key).
+  - Pass that path with `--key-file`. Never open, print or copy the file.
+  - 503 "high demand" is common: wait 10+ minutes and retry the same request. In a studio project, Dailies & QC skips a failed Gemini call instead of waiting on it, and never blocks a stage on it.
 
 ## 2. Standing rules (user decisions)
 
-1. No sol-attn / BlockSparseAttention for high-motion work. Bypass it if it's present.
+1. sol-attn (BlockSparseAttention, node 190) is the default for H3, for speed (user decision 2026-10-09; it replaces the earlier "no sol-attn for high-motion work").
+   - It applies to H3 video generation only, never to Krea.
+   - When the user reports low quality, or VRAM fills, switch to the chunking setup with no sol (attention profile `chunked` in §4).
 2. Decode H3 with H3 VAE Decode (Blend Mode) = legacy.
 3. Free VRAM with KJNodes `VRAM_Debug` pass-throughs (all three options on) after samplers and decodes. The user decided the existing H3regenrunsTest memory setup is fine; no VRAM_Debug is needed after the text encoder.
 4. Queue only the nodes that feed active outputs (graphToPrompt already drops bypassed nodes). At the end of a batch, POST `/api/free {"unload_models":true,"free_memory":true}`.
 5. TaoMate LoRA needs at least 3 of its own steps; skip it in pass 1 if the clip will be de-roped.
 6. Judge motion in playback, never from stills. For the music video, audio is never needed.
-7. Never build big comparison grids inside ComfyUI (100+ GB RAM). Use ffmpeg xstack/drawtext in the cloud workspace and commit the result.
+7. Never build big comparison grids inside ComfyUI (100+ GB RAM). Use ffmpeg xstack/drawtext from the shell (ffmpeg is on PATH).
 8. Never use video references (`ref_videos`) locally: far too much compute.
 9. Batches: don't rename folders. Track finished items in the project doc's status table.
 10. No dialogue or voice lines in generations (user decision 2026-10-05). Keep sound effects and music.
 11. Work inside each character's regen folder: `output/video/Reruns/<Folder>/`. Put ultimate-sequence assets (Krea prompts, sheets, H3 prompts, videos) in `Reruns/<Folder>/Ultimate/`. Point SaveVideo and Image Saver paths there.
+    - In a studio project, outputs go to `output/studio/<CODE>/units/` instead: SaveVideo prefix `studio/<CODE>/units/<TAKE>/<TAKE>`, with the prompt saved beside the take.
 
 ## 3. ComfyUI API recipe (browser JavaScript)
 
-- **Open a workflow.** Call `app.extensionManager.workflow.openWorkflow(ws.getWorkflowByPath('workflows/NAME.json'))`, then reload the page. Without the reload, the tab switches but `app.rootGraph` keeps the old graph, and graphToPrompt then returns the wrong workflow. If `getWorkflowByPath` returns null for a newly written file, reload first.
+- **Open a workflow** (in the studio's own tab only). Call `app.extensionManager.workflow.openWorkflow(ws.getWorkflowByPath('workflows/NAME.json'))`, then reload the page.
+  - Without the reload, the tab switches but `app.rootGraph` keeps the old graph, and graphToPrompt then returns the wrong workflow.
+  - If `getWorkflowByPath` returns null for a newly written file, reload first.
+  - Before any reload, check that no open workflow has unsaved changes, and stop if one does.
 - **Check before queuing.** Confirm known node IDs exist in `app.rootGraph`. Then `p = await app.graphToPrompt()` gives `p.output` (the API prompt) and `p.workflow`.
 - **Patch values by node ID** in `p.output`. Subgraph nodes appear as `"parent:child"`.
 - **Queue** with POST `/api/prompt` and body `{prompt, client_id: app.api.clientId, extra_data: {extra_pnginfo: {workflow}}}`. Mirror the same values into `workflow.nodes[].widgets_values` so the saved file embeds the real workflow. Check `node_errors`: jobs with node errors fail at once.
-- **Monitor.** Poll `/api/history/<id>` (`status.status_str`, `outputs`); `/api/queue`; the `progress` event via `app.api.addEventListener`. Don't poll faster than every few minutes for long H3 jobs.
-- **Long text** (prompts): write a .txt into the output folder with the device commit tool. Read it in the page with `fetch('/api/view?filename=..&subfolder=..&type=output').then(r=>r.text())`, rather than pasting it into JavaScript.
+  - In the studio, queue only what the project's approval policy allows. The `comfy-bridge` skill and the guardrail hooks check it before each submit.
+- **Monitor.** Poll `/api/history/<id>` (`status.status_str`, `outputs`) and `/api/queue`, from the shell; the page's `progress` event via `app.api.addEventListener` also works while the tab is connected. Don't poll faster than every few minutes for long H3 jobs.
+  - Progress messages go only to the client that queued the job (the studio tab). The shell-side watchdog follows ComfyUI's console log instead (`vram-watch` skill).
+- **Long text** (prompts): write the .txt directly to disk under the output folder (studio: `C:\CU\output\studio\<CODE>\…`). Read it in the page with `fetch('/api/view?filename=..&subfolder=..&type=output').then(r=>r.text())`, rather than pasting it into JavaScript.
 - **Images.** Fetch them from `/api/view` (type=output) as a blob and upload with POST `/api/upload/image` (FormData `image`, `subfolder`, `type=input`, `overwrite=true`). Reference them as `subfolder/name`.
 - **Anything Everywhere and similar broadcast nodes** don't show up in graphToPrompt. Connect those inputs yourself (see the Krea section). Frontend-only seed randomizers (easy globalSeed, rgthree) don't run over the API, so set seeds explicitly.
 - **Save locations.** The SaveVideo `filename_prefix` is relative to output, e.g. `video/Reruns/<Folder>/<Folder>_15s`. Image Saver uses `path` plus `filename`.
-- **New workflow files.** Build the UI JSON in Python from the base file (copy nodes, add links `[id, from, slot, to, slot, type]`, bump `last_node_id`/`last_link_id`). Commit it to the workflows folder, then open it with the reload trick and graphToPrompt it to validate before queuing.
+- **New workflow files.** Build the UI JSON in Python from the base file (copy nodes, add links `[id, from, slot, to, slot, type]`, bump `last_node_id`/`last_link_id`).
+  - The workflows folder is the user's and lies outside the studio's write folders, so writing a new file there needs the user's approval.
+  - Then open it with the reload trick and graphToPrompt it to validate before queuing.
+- **Configuration changes without touching the saved file** (attention profiles, §4): set `node.mode` (0 = on, 4 = bypass) on `app.rootGraph` nodes in the studio tab before `graphToPrompt`, and don't save the workflow.
 
 ## 4. H3 workflows
 
@@ -55,6 +78,13 @@ Project docs (claude.ai project "Minimax H3 Prompts") hold the running state: `c
 - **`H3ultRefsTest`**: the same plus LoadImage 235 → `ref_images.ref_image_1` and 236 → `ref_images.ref_image_2`; 1.5 MP (1664×928); 10 s (243 frames). Used for character sheet + cutout sheet + VFX sheet tests. With the Sage patches it ran at about 70 s per step (33 min) with 3 refs at "max", with no VRAM or RAM trouble.
 - **Speed configuration** (user suggestion, used from `H3ultRefsTest2` onward; check the timing on the first run): the model chain is 127 UNET → 152 preview → 187 ModelAttentionBackend "comfy kitchen attention" (on) → 159 PathchSageAttentionKJ (bypassed) → 158 MiniMaxChunkFeedForward chunks 2 / seq_threshold 4096 (on) → 155 MiniMaxLowVRAMAttention head_chunks 4 (on) → 153 MiniMaxH3MemoryEfficientSageAttentionPatch (bypassed). Set node modes 0 = on and 4 = bypass in the UI JSON.
 - The node accepts up to 9 pictures, 3 videos (never use them) and 3 audios. "max" ref size (2048 short edge) costs time with several refs; "match" is the faster option if VRAM or time becomes a problem.
+- **Attention profiles** (user decision 2026-10-09).
+  - All H3 workflows share one model chain with the same node IDs: 127 UNET → 152 preview (taeh3, the live preview the user watches) → 187 ModelAttentionBackend → 159 PathchSageAttentionKJ → 158 MiniMaxChunkFeedForward → 155 MiniMaxLowVRAMAttention → 153 MemoryEfficientSageAttentionPatch → 154 LoRA → 190 BlockSparseAttention → 193 → sampler.
+  - A profile is a set of node modes, applied in the page before graphToPrompt (§3):
+    - **`sol` (default for every H3 job):** 187 and 190 on; 153, 155, 158 and 159 bypassed. This is H3ultSingleRefSparse as saved. Its time and VRAM peak are not measured yet; plan with the measured non-sol numbers above as the upper bound until a smoke test measures them.
+    - **`chunked` (fallback when the user reports low quality or VRAM fills):** 187, 155 and 158 on; 153, 159 and 190 bypassed. This is H3ultRefsTest2 as saved.
+    - **`sage`:** 159 and 153 on; 155, 158, 187 and 190 bypassed. This is H3regenrunsTest as saved, and the setup behind its measured 22–28.5 min.
+  - Leave every other node as the user saved it, 152 included.
 
 ## 5. Writing H3 ref2va prompts
 
@@ -131,7 +161,7 @@ Reference analysis (two HSR ultimates, about 10 s each, real-time engine at 60 f
 - **VFX style that worked** (v3): "real-time game visual-effect renders captured at their most intense peak frame, as seen in Honkai: Star Rail ultimate cutscenes … rendered like premium in-engine anime VFX, not flat illustrations": additive glow overexposing to white at the core, volumetric bloom and haze, semi-transparent energy sheets and flipbook-style smear shapes, motion blur, particles at several depths, prismatic fringes, dark accent strokes; a white-hot → magenta/violet → indigo gradient.
   - The concept-sheet framing produced flat icons. Make each effect distinct in silhouette (the emblem and the hit burst came out too alike).
   - Leave an impact-frame panel off the VFX sheet, since impact frames are prompted in text only. Use that slot for another signature effect (e.g., a shockwave ring or ribbon trail).
-- **Review.** Before use, check faces and eyes on any character item, that every listed item is present, and that items are separated. The user chose cutouts v2 seed 20261008 and VFX v3 seed 20261011 for the Nyxara test. In an approved production run there is no user review: apply these checks yourself and regenerate with a new seed when one fails.
+- **Review.** Before use, check faces and eyes on any character item, that every listed item is present, and that items are separated. The user chose cutouts v2 seed 20261008 and VFX v3 seed 20261011 for the Nyxara test. In an approved production run there is no user review: apply these checks yourself and regenerate with a new seed when one fails. In a studio project, the project's approval policy sets how many retakes a still gets and how the user chooses between candidates.
 - **Splitting into single-item references** (optional, up to 9 pictures in total): a background-difference mask with dilation and connected components works when items are spaced (the VFX v1 sheet split 6/6). Use a fixed grid crop when the panels fill their cells (VFX v3: 3×2 cells of 640×540 at 1080p).
 
 ## 8. QA after each run
@@ -142,6 +172,8 @@ Reference analysis (two HSR ultimates, about 10 s each, real-time engine at 60 f
 - Report what worked and what didn't, with timestamps, and record durable findings in the project docs.
 
 ## 9. Batch reruns (`output/video/Reruns`)
+
+Standalone gacha work, outside the studio. `output/video/Reruns` and `input/reruns` lie outside the studio's write folders, so writing prompt files there needs the user's approval for each batch. Sheet uploads go through ComfyUI's `/api/upload/image` from the page, as in §3.
 
 - Each folder holds a character sheet (`*.png~tplv-...-image.png`) and `prompt.txt` / `prompt2.txt` (10 s originals).
 - For each folder:

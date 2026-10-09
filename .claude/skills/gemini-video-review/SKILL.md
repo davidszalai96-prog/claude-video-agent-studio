@@ -14,18 +14,23 @@ Gemini watches every sampled frame and hears the audio, so it is fast and thorou
 
 ## 1. Before running anything
 
-**Find out where the files are relative to your shell.** The scripts need the video on a filesystem your shell can read:
+**Files.** Claude Code's shell runs on the user's PC, so use real paths:
+- `C:\CU\output\studio\<CODE>\units\…` for studio takes;
+- `C:\CU\output\video\…` for earlier clips.
 
-- Your shell runs on the user's computer (Claude Code, or a desktop session with a local folder): use the real path, e.g. `C:\CU\output\video\clip.mp4`.
-- Your shell runs in a sandbox and the user's folder is mounted into it: use the mounted path.
-- There is a tool that copies files from the user's computer into the sandbox: copy the video in first. If the API key lives in a file, copy that file too, by path, without opening it.
-- The user uploaded the video into the chat: use it from the uploads folder.
+Never read from D:. If a file is somewhere this session can't reach, say so plainly. Don't build a workaround through an unrelated app such as a video editor's script menu; it is fragile and hard for the user to repeat.
 
-If none of these applies, tell the user plainly that you can't reach the file from this session and what would fix it (for example, giving Claude Desktop access to that folder, or uploading the clip). Don't build a workaround through an unrelated app such as a video editor's script menu; it is fragile and hard for the user to repeat.
+**Where reports go.** Always pass `--out`, because the scripts otherwise write next to the video:
+- for a studio take: `projects/<CODE>/06_dailies/<TAKE>/` (reports) and `…/sheets/` (contact sheets);
+- outside a project: Claude Code's scratch folder.
 
-**Network.** The script calls `https://generativelanguage.googleapis.com`. If it reports a network error inside a sandbox, ask the user to allow that domain in the network settings.
+The studio may write only inside this repo and `C:\CU\output\studio`.
 
-**Tools.** Python 3.8+. `frames.py` also needs ffmpeg (or `pip install imageio-ffmpeg`), and Pillow for the contact sheets.
+**Network.** The script calls `https://generativelanguage.googleapis.com` directly from this PC.
+
+**Tools.** Run the scripts with the studio venv, `.venv\Scripts\python.exe`; bare `python` is the Microsoft Store alias.
+- `gemini_video.py` needs only the standard library.
+- `frames.py` needs ffmpeg (on PATH) and Pillow for the contact sheets. Pillow arrives with the venv's media stack; install it first if it's missing.
 
 ## 2. The API key
 
@@ -44,6 +49,8 @@ The script finds the key by itself and reports only where it found it. It checks
 
 If it finds nothing, ask the user for the path to their key file or to set `GEMINI_API_KEY`. Keys are created at Google AI Studio.
 
+**On this PC** the key file is `C:\CU\output\video\geminiapi.txt`. Always pass it explicitly, as `--key-file "C:/CU/output/video/geminiapi.txt"`, and never open, print or copy that file. Reading it with a file tool is blocked by the project settings.
+
 ## 3. Pick the video
 
 Don't assume the newest file is the one the user means.
@@ -52,7 +59,7 @@ Don't assume the newest file is the one the user means.
 - Otherwise list the folder and let them choose:
 
 ```bash
-python scripts/gemini_video.py --list "C:/CU/output/video"
+.venv/Scripts/python.exe .claude/skills/gemini-video-review/scripts/gemini_video.py --list "C:/CU/output/video"
 ```
 
   This prints modified time, duration, size and name, newest first. Show the user the handful that plausibly match and ask which one.
@@ -60,13 +67,15 @@ python scripts/gemini_video.py --list "C:/CU/output/video"
 
 ## 4. Run Gemini
 
+From the repo root, with `G=.claude/skills/gemini-video-review/scripts` and `KEY="C:/CU/output/video/geminiapi.txt"`:
+
 ```bash
-python scripts/gemini_video.py "PATH/clip.mp4"                        # blind shot breakdown, 12 fps
-python scripts/gemini_video.py "PATH/clip.mp4" --dry-run              # check key, duration, token estimate
-python scripts/gemini_video.py "PATH/clip.mp4" --start 6 --end 12     # one segment only
-python scripts/gemini_video.py a.mp4 b.mp4 c.mp4 --batch --fps 6      # several clips, ONE request
-python scripts/gemini_video.py "PATH/clip.mp4" --mode compare --gen-prompt prompt.txt
-python scripts/gemini_video.py "PATH/clip.mp4" --mode custom --prompt-file ask.txt --json
+.venv/Scripts/python.exe $G/gemini_video.py "PATH/clip.mp4" --key-file "$KEY" --out OUTDIR                     # blind shot breakdown, 12 fps
+.venv/Scripts/python.exe $G/gemini_video.py "PATH/clip.mp4" --key-file "$KEY" --dry-run                        # check key, duration, token estimate
+.venv/Scripts/python.exe $G/gemini_video.py "PATH/clip.mp4" --key-file "$KEY" --out OUTDIR --start 6 --end 12  # one segment only
+.venv/Scripts/python.exe $G/gemini_video.py a.mp4 b.mp4 c.mp4 --key-file "$KEY" --out OUTDIR --batch --fps 6   # several clips, ONE request
+.venv/Scripts/python.exe $G/gemini_video.py "PATH/clip.mp4" --key-file "$KEY" --out OUTDIR --mode compare --gen-prompt prompt.txt
+.venv/Scripts/python.exe $G/gemini_video.py "PATH/clip.mp4" --key-file "$KEY" --out OUTDIR --mode custom --prompt-file ask.txt --json
 ```
 
 **Modes.** Default to `shots`, and do the prompt comparison yourself.
@@ -93,10 +102,12 @@ Add `--low-res` to use roughly four times fewer tokens per frame when a batch is
 
 ## 5. Take your own look
 
+`SHEETS` is the take's `06_dailies/<TAKE>/sheets/` folder, or a scratch folder outside a project:
+
 ```bash
-python scripts/frames.py "PATH/clip.mp4" --out /tmp/clip_frames --cuts             # 4 fps sheets + cut times
-python scripts/frames.py "PATH/clip.mp4" --out /tmp/clip_zoom --fps 12 --start 9 --end 11
-python scripts/frames.py "PATH/clip.mp4" --out /tmp/clip_keys --times 1.5,4.9,6.3 --width 960
+.venv/Scripts/python.exe $G/frames.py "PATH/clip.mp4" --out "$SHEETS/overview" --cuts             # 4 fps sheets + cut times
+.venv/Scripts/python.exe $G/frames.py "PATH/clip.mp4" --out "$SHEETS/zoom_9-11" --fps 12 --start 9 --end 11
+.venv/Scripts/python.exe $G/frames.py "PATH/clip.mp4" --out "$SHEETS/keys" --times 1.5,4.9,6.3 --width 960
 ```
 
 View the `sheet_*.jpg` images. Every tile is labeled with its timestamp.
