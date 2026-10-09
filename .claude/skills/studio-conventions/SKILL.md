@@ -131,8 +131,34 @@ T0 and T1 go straight into the next cut. T2 and up spend GPU time and follow the
 - **Approval.** The Producer asks the user, naming the ticket and the window. A hook records the user's answer to `00_admin/approvals/R-###.json`, bound to the ticket file's SHA-256; editing the ticket afterwards voids the approval.
   - A ticket never says "approved" itself.
   - Agents never write anything under `00_admin/approvals/`, and never treat a ticket as approved without a record that still matches.
+- **How to ask** (Producer, with AskUserQuestion; the policy is asked the same way):
+  1. Run `.venv\Scripts\python.exe pipeline\tools\ticket.py summary <CODE> R-###` and put what it prints in the question.
+  2. Run `ticket.py marker <CODE> R-###` and append its output to the question text, e.g. `[studio-approve MAG R-004 sha256=…]`.
+  3. Give options whose labels start with `Approve` or `Reject`.
+  - Free-text answers are not recorded: clarify, revise, and ask again.
+  - Read the result with `ticket.py status <CODE>`.
+  - If the hook route is unavailable, the user can approve in their own terminal with `ticket.py approve <CODE> R-###`. Agents can't run it.
 - **Window.** Nothing starts after the window ends. A job that cannot finish before the end waits for the next window.
 - **Retakes and pickups** ride along with the next ticket, unless the project's policy allows them inside an approved ticket.
+- **Every studio submit carries a marker** in the page script or command:
+  - `// studio-run: <CODE> R-### <OUTPUT_ID>`: the job must be in the approved, unchanged ticket, inside its open window;
+  - `// studio-still: <CODE> <OUTPUT_ID>`: a Krea still under a policy whose stills need no approval, with a job spec on one of the project's Krea templates.
+
+  The guard hook also refuses any submit while ComfyUI's queue isn't empty, and refuses submits from any agent other than the Render Wrangler and the Pipeline TD.
+
+## Guardrails (enforced by hooks, not by prompts)
+
+`.claude/hooks/guard.ps1` runs before every Write, Edit, Bash, PowerShell and page-script call. It blocks:
+- anything on D:;
+- file writes outside the repo, an approved footage folder, Claude Code's scratch folder and the project memory folder;
+- reading or printing the Gemini key or `.env` files;
+- writing `00_admin/approvals/`. Even a command that only *names* that folder is blocked if it also runs a writer such as Python; use `cat` or `ticket.py status` to read approvals;
+- studio agents changing hooks, settings, agents, `.mcp.json` or the watchdog's files;
+- unmarked or unapproved submits;
+- interrupting ComfyUI or clearing its queue;
+- running the restart script for real, or killing ComfyUI.
+
+A blocked call returns "Blocked by studio guardrail: <reason>". Don't work around it. Report it, and ask the Producer, who asks the user.
 
 ## What never goes into a project file
 

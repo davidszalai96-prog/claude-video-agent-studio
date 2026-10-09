@@ -35,6 +35,12 @@ An agentic animation studio on this PC: a Producer and 14 specialist agents plan
 11. **Media never goes into git:** renders, audio, images, model files.
 12. **Never install into ComfyUI's venv** (`C:\CUVenv`). The studio has its own venv (see below).
 
+## Guardrails are enforced by hooks
+
+- `.claude/hooks/guard.ps1` (PreToolUse) blocks breaches of rules 2–8 before they run, in every permission mode. See the `studio-conventions` skill (Guardrails).
+- `.claude/hooks/record-approval.ps1` (PostToolUse on AskUserQuestion) records approvals from the user's answers. Questions are marked with `pipeline\tools\ticket.py marker`.
+- File tools are checked exactly; shell commands are checked best-effort. A block is never worked around: report it and ask.
+
 ## Working protocol (Phase 1)
 
 Work through `KICKOFF.md` Phase 1 one step at a time. After each step, show what changed, commit locally with a clear message, and wait for the user's OK. Push only when the user says so.

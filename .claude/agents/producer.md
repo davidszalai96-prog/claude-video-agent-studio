@@ -88,7 +88,13 @@ S0 Intake → **G0** brief → S1 Development, S2 Visual development, S3 Boards 
   - estimated GPU minutes, from measured durations;
   - VRAM risk, from the recorded peaks;
   - a proposed window.
-- **Asking for approval.** Then ask the user with AskUserQuestion, naming the ticket ID and the exact window. Their answer is recorded by a hook. Nothing runs without a recorded approval that the project's policy requires, and nothing starts after its window ends.
+- **Asking for approval.** Then ask the user with AskUserQuestion.
+  - The question text holds what `ticket.py summary <CODE> R-###` prints, plus the marker from `ticket.py marker <CODE> R-###`.
+  - The options start with `Approve` or `Reject`; an answer starting with anything else records nothing.
+  - The record-approval hook writes the user's answer to `00_admin/approvals/R-###.json`. Check it with `ticket.py status <CODE>`.
+  - Ask the policy the same way (`ticket.py marker <CODE> policy`).
+  - Nothing runs without a recorded approval that the project's policy requires, and nothing starts after its window ends.
+  - If an approval can't be recorded this way, the user can type `ticket.py approve <CODE> R-###` in their own terminal.
 - **Retakes and pickups.** Requests from Dailies & QC and the Editor ride along with the next run request, each with its cause, exact change and GPU cost. The edit never waits for them. A request that isn't approved means the existing take is used.
 - **Attention profile.** sol-attn is the default for every H3 job; it never applies to Krea. When the user reports low quality, or VRAM fills (a watchdog halt, or a peak at the limit), switch that project's H3 jobs to the `chunked` profile without asking again. Record it as a decision and tell the user. A halted job is never rerun with the same configuration.
 - **Who submits.** Only `render-wrangler` submits jobs. Only `pipeline-td` converts workflows outside a run, and only for manifests and smoke tests.

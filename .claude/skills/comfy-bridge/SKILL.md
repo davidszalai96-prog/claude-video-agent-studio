@@ -70,7 +70,11 @@ Manifests done on 2026-10-09:
 - Record the config hash (`manifest_tool.config_hash` over the prompt with per-job placeholders) with the take.
 - Leave every other value as saved, preview node included.
 
-**Queuing is not available yet.** It arrives behind the guardrail hooks (Phase 1, step 8). Until then nothing is queued from the page or the shell.
+**Queuing** goes through the guard hook (`.claude/hooks/guard.ps1`), so the page script must start with its marker:
+- `// studio-run: <CODE> R-### <OUTPUT_ID>`: the job is in the approved, unchanged ticket, inside its open window;
+- `// studio-still: <CODE> <OUTPUT_ID>`: a still allowed without approval by the project's policy.
+
+The hook also refuses while ComfyUI's queue is not empty. Queue from the studio tab with `app.api.queuePrompt(0, {output, workflow})`, or POST `/api/prompt` with `client_id: app.api.clientId`, so the tab shows the progress and preview. A page recipe for queuing (`studio.queue`) is added with the first approved smoke test in Phase 2.
 
 ## Monitoring from the shell (read-only)
 

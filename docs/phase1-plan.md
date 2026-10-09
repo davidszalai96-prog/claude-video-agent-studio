@@ -136,6 +136,37 @@ Plus `bridge/comfy_api.py` (status, queue, history, free, outputs, logs; no subm
 - `pipeline/tools/ticket.py`: create a proposed ticket, check whether a window is open.
 - Hook tests.
 
+*Built 2026-10-10:*
+- **`guard.ps1`** (PreToolUse on Write, Edit, NotebookEdit, MultiEdit, Bash, PowerShell and both browsers' JavaScript tools) blocks:
+  - the failing drive;
+  - writes outside the repo, an approved footage folder, the scratch folder and the memory folder;
+  - Gemini key and `.env` reads;
+  - approval writes;
+  - studio agents changing guardrail files;
+  - unmarked or unapproved ComfyUI submits, submits while the queue is busy, and submits by agents other than the Render Wrangler and the Pipeline TD;
+  - interrupting ComfyUI or clearing its queue or history;
+  - running the restart script for real, or killing ComfyUI;
+  - the terminal approval command.
+
+  It takes about 0.27 s per call. Read, Glob and Grep are not hooked; the settings' deny rules already cover the failing drive and the key files for them.
+- **`record-approval.ps1`** (PostToolUse on AskUserQuestion) records approved or rejected answers, only for marked questions, bound to the file's SHA-256. A previous record moves to `history/`.
+- **`ticket.py`** has `marker`, `summary`, `status`, and `approve` (the user's terminal fallback, which refuses without an interactive terminal).
+- The approval schema now also accepts `recorded_by: user:terminal`.
+- 61 more tests (135 in total). `test_hooks.py` runs the real PowerShell hooks.
+
+*Live checks in this session (the hooks hot-load from settings):*
+- The guard blocked a probe naming the restart script.
+- Approving a throwaway test ticket, whose window had already ended, produced a valid record bound to the ticket. The test project was then deleted.
+- Claude Code 2.1.296 puts the answers in both `tool_input.answers` and `tool_response.answers`, keyed by the question text.
+- Hooks also run in bypass-permissions mode.
+- Without `--agent`, the payload has no `agent_type`. The guardrail-file and submitter checks therefore apply to studio agents only, and the build session can still edit the hooks.
+
+*Limits, stated plainly:*
+- Shell commands are checked by pattern, so a script that writes through an indirect path (for example a Python file that builds the path at run time) can slip past. File tools are exact.
+- Pattern checks also give false positives: a command whose text merely mentions the failing drive's letter followed by a colon, or names the approvals folder next to a writer such as Python, is blocked. Write such text to a file with a file tool instead.
+- A click on ComfyUI's Queue button through the browser's computer tool can't be told apart from other clicks. Agents are instructed to queue only by script.
+- Opening an existing Resolve project through the MCP is not hooked yet. It is a candidate for step 9.
+
 **Step 9: Resolve MCP.** `.mcp.json` with the `davinci-resolve` command and env copied from Claude Desktop's config, including `RESOLVE_SCRIPT_LIB=C:\DavinciResolve\fusionscript.dll`. Then verify with `resolve_control get_version` in a new throwaway project that you open.
 
 ## 3. What does not fit this PC, and what I propose
