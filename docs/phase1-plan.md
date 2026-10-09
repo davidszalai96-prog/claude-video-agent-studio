@@ -91,7 +91,7 @@ Plus `bridge/comfy_api.py` (status, queue, history, free, outputs, logs; no subm
 ## 3. What does not fit this PC, and what I propose
 
 **A. Python.** `python` on PATH is the Microsoft Store alias, and there is no `py` launcher. `C:\Program Files\Python312` (3.12.10) has no packages. ComfyUI's venv (`C:\CUVenv`) has most of what the studio needs, but installing into it could break ComfyUI.
-*Proposal:* a studio venv at `.venv` in the repo, built from `C:\Program Files\Python312`, installed from PyPI. Phase 1 needs only light packages: jsonschema, pyyaml, requests, websocket-client, psutil, nvidia-ml-py and opentimelineio. The media stack (numpy, opencv-python, scenedetect, librosa, onnxruntime, Pillow, soundfile) is installed when Phase 2 first needs it. Installing needs your OK, because it downloads packages.
+*Approved 2026-10-09:* ComfyUI.bat keeps using its own venv, and the studio gets a separate one: a studio venv at `.venv` in the repo, built from `C:\Program Files\Python312`, installed from PyPI. Phase 1 needs only light packages: jsonschema, pyyaml, requests, websocket-client, psutil, nvidia-ml-py and opentimelineio. The media stack (numpy, opencv-python, scenedetect, librosa, onnxruntime, Pillow, soundfile) is installed when Phase 2 first needs it. Installing needs your OK, because it downloads packages.
 
 **B. Shell.** Only Windows PowerShell 5.1 is installed (no pwsh 7), so the hooks use 5.1 syntax. Each hook call costs roughly 0.3–0.5 s of PowerShell start-up per matched tool call.
 
@@ -102,8 +102,15 @@ Plus `bridge/comfy_api.py` (status, queue, history, free, outputs, logs; no subm
 **D. Reloading your ComfyUI tab.** The working recipe (openWorkflow, then reload the page) changes what your tab shows, and it can drop unsaved edits in an open workflow.
 *Proposal:* the studio opens its own ComfyUI tab in Chrome, which is the same server and the same queue that you see. Before any reload it checks for unsaved workflows and stops if there are any.
 
-**E. The watchdog can't see a browser job's progress.** ComfyUI sends `progress` messages only to the websocket of the client that queued the job (`main.py:448`, `execution.py:737`). Connecting with the browser's clientId would replace your tab's socket (`server.py:281`).
-*Proposal:* the page queues each studio job with the watchdog's client_id. The job still appears in your queue. As a second signal, the watchdog also reads `/api/queue`, nvidia-smi and the console log at `/internal/logs/raw`. This is checked read-only in step 7; the live test waits for an approved window.
+**E. Jobs run in the browser; the watchdog follows the console log.** You need to watch each job's progress and its preview node in ComfyUI. ComfyUI sends `progress`, preview and `executed` messages only to the websocket of the client that queued the job (`main.py:448`, `execution.py:737`). Connecting with the browser's clientId would replace your tab's socket (`server.py:281`).
+*Decided (2026-10-09):*
+- Every job is queued from the browser tab with that tab's own client ID, as in the current recipe. That tab shows the progress bar and the preview node exactly as when you queue by hand.
+- The watchdog never queues. It follows ComfyUI's console log, which is the feed behind ComfyUI's terminal panel:
+  - it subscribes over its own websocket (`PATCH /internal/logs/subscribe`), with `/internal/logs/raw` as a polling fallback;
+  - every entry is timestamped, and the sampler's step counter is in it (`app/logger.py` keeps `\r` progress updates);
+  - it also reads `/api/queue`, `/api/history` and nvidia-smi.
+- Risk: `/internal/*` is marked as frontend-only, so a ComfyUI update could change it. The environment pin and the smoke test catch that.
+- Checked read-only in step 7; the live test waits for an approved window.
 
 **F. The approval flow must be unforgeable.** If the run-ticket check only reads a JSON file, an agent could write "approved" itself.
 *Proposal:* approval comes only from your answer in chat. The Producer asks with a question that names the ticket and the window. A `PostToolUse` hook records your answer to `00_admin/run_tickets/approvals/R-###.json`. A `PreToolUse` hook blocks every agent write to that folder. The submit hook, the bridge and the watchdog all trust only those records plus the clock.
@@ -142,9 +149,9 @@ Plus `bridge/comfy_api.py` (status, queue, history, free, outputs, logs; no subm
 
 Your "OK" accepts the proposals as written. Change any of them by number:
 
-1. Studio venv at `.venv`, light packages now (3.A).
+1. ~~Studio venv at `.venv`, light packages now (3.A).~~ Approved.
 2. The approval flow through your chat answer, recorded by a hook (3.F).
 3. The write allowlist plus scratch and memory folders (3.G).
-4. A dedicated studio ComfyUI tab (3.D).
+4. A dedicated studio ComfyUI tab (3.D). Jobs run in that tab, so that is where you watch progress and the preview node. The alternative is your own tab, with the unsaved-edit check before each reload.
 5. Only the three named workflows (3.H).
 6. Port four skills now; the h3 split later (3.J).
