@@ -202,7 +202,9 @@ Points for you:
 **K. Design details that don't apply here.**
 - The example agent file's `mcp__comfyui` / `mcpServers: comfyui` doesn't exist. The Render Wrangler uses the Claude in Chrome tools and Bash.
 - "Haiku for polling" is unnecessary, because polling is done by scripts, not by a model.
-- Whether the frontmatter supports per-agent effort ("Opus, high effort" for the Prompt Writer) gets checked in step 4.
+- Per-agent effort is supported (checked in step 4), and the Prompt Writer uses `effort: high`.
+- Subagents cannot use AskUserQuestion, so only the Producer asks the user, as the design intends.
+- The Art Director gets Bash, which the design doesn't list, so it can build mood-board and look-test contact sheets. It never runs ComfyUI.
 
 **L. Resolve MCP.**
 - Claude Desktop's config already defines `davinci-resolve`, and the Desktop app's Code tab already loads it. The project `.mcp.json` is what CLI sessions need. Whether the Desktop app then shows the server twice gets checked in step 9.
