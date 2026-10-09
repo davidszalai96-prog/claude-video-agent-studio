@@ -8,11 +8,12 @@ An agentic animation studio on this PC: a Producer and 14 specialist agents plan
 ## Hard rules
 
 1. **The user is the only approver.** Ask before anything with side effects outside this repo.
-2. **GPU work follows the project's approval policy.**
-   - The user defines the policy for each project at intake.
-   - It is recorded in `projects/<CODE>/00_admin/approvals/policy.json` from the user's own answer.
-   - Until a project has a recorded policy, nothing is queued in ComfyUI without an approved run ticket whose window is open.
-   - Building and reading are always fine; rendering is not.
+2. **The user defines each project's rules when the project is defined.** The Producer asks, and never assumes, three things:
+   - the **approval policy** for GPU work;
+   - the **workflow templates**: the saved ComfyUI workflows this project uses. There are no global defaults; if none are named, prompt the user at project initialization;
+   - the **footage folder**: where ComfyUI writes this project's takes and stills. It must be inside `C:\CU\output`, because ComfyUI refuses to save anywhere else; `C:\CU\output\studio\<CODE>` is the suggestion.
+
+   The answers are recorded in `projects/<CODE>/00_admin/approvals/policy.json` from the user's own answers. Until a project has a recorded policy, nothing is queued in ComfyUI for it without an approved run ticket whose window is open. Building and reading are always fine; rendering is not.
 3. **Agents never write approvals.**
    - Nothing under `00_admin/approvals/` is written by an agent. A hook records the user's answers there.
    - An agent never claims an approval that isn't recorded.
@@ -24,7 +25,7 @@ An agentic animation studio on this PC: a Producer and 14 specialist agents plan
 5. **Never read from or write to D:** (failing drive). This includes listing it, querying it, and relinking or caching anything to it.
 6. **Writes are allowed only in:**
    - this repo;
-   - `C:\CU\output\studio`;
+   - each project's recorded footage folder;
    - Claude Code's scratch folder (`%TEMP%\claude\…`);
    - this project's memory folder (`~\.claude\projects\C--claude-video-agent-studio\memory`).
 7. **Never open, modify or render an existing DaVinci Resolve project.** Tests use a new project. Never update Resolve past 21.0.x.
@@ -44,7 +45,7 @@ Work through `KICKOFF.md` Phase 1 one step at a time. After each step, show what
 | --- | --- |
 | ComfyUI | 0.37.0 at `C:\CU`; API `http://127.0.0.1:8188`; its own venv `C:\CUVenv` |
 | ComfyUI launcher | `C:\Users\david\Desktop\ComfyUI.bat` (vcvars64 → `C:\CUVenv` → `python main.py --cuda-device 0 --disable-pinned-memory --disable-comfy-compiler`) |
-| ComfyUI folders | workflows `C:\CU\user\default\workflows`, input `C:\CU\input`, output `C:\CU\output`, studio takes `C:\CU\output\studio\<CODE>\units\` |
+| ComfyUI folders | workflows `C:\CU\user\default\workflows`, input `C:\CU\input`, output `C:\CU\output`. Each project's footage folder is inside output: `<footage>\units\<TAKE>\` for H3 takes, `<footage>\stills\<ID>\` for Krea stills. |
 | GPU / RAM | RTX 5090 32 GB / 128 GB |
 | Studio Python | `.venv\Scripts\python.exe` (3.12.10, built from `C:\Program Files\Python312`). Bare `python` on PATH is the Microsoft Store alias, so never use it. |
 | ffmpeg / ffprobe | 8.1.2 on PATH (winget) |
@@ -85,7 +86,10 @@ projects\<CODE>\
   08_finish\   conform\, renders\
   09_delivery\
   10_wrap\
+<footage folder>\      chosen by the user, inside C:\CU\output: units\<TAKE>\, stills\<ID>\
 ```
+
+A rerun batch outside a film is defined like a project, with its own footage folder.
 
 ## Naming
 

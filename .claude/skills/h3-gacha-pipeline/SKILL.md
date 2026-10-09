@@ -22,7 +22,7 @@ Record new H3 findings in `docs/notes/` in this repo.
   - Jobs are queued from that tab with its own client ID, so the user can watch progress and the preview node there.
 - **Monitoring** runs from the shell against the same HTTP API, which keeps working if the browser connection goes idle. The details are in the `comfy-bridge` skill.
 - **Files.** Claude Code has a local shell and reads and writes files directly on disk.
-  - Writes are allowed only in this repo and in `C:\CU\output\studio` (`CLAUDE.md`, rule 6).
+  - Writes are allowed only in this repo and in each project's footage folder (`CLAUDE.md`, rule 6).
   - Never move or rename the user's folders (rule 9 below).
 - **Gemini.** Video review is available through the `gemini-video-review` skill. The key is in `C:\CU\output\video\geminiapi.txt` (an `AQ.` key).
   - Pass that path with `--key-file`. Never open, print or copy the file.
@@ -43,7 +43,7 @@ Record new H3 findings in `docs/notes/` in this repo.
 9. Batches: don't rename folders. Track finished items in the project doc's status table.
 10. No dialogue or voice lines in generations (user decision 2026-10-05). Keep sound effects and music.
 11. Work inside each character's regen folder: `output/video/Reruns/<Folder>/`. Put ultimate-sequence assets (Krea prompts, sheets, H3 prompts, videos) in `Reruns/<Folder>/Ultimate/`. Point SaveVideo and Image Saver paths there.
-    - In a studio project, outputs go to `output/studio/<CODE>/units/` instead: SaveVideo prefix `studio/<CODE>/units/<TAKE>/<TAKE>`, with the prompt saved beside the take.
+    - In a studio project, outputs go to the project's footage folder instead. The user chooses it at project definition, and it must be inside `C:\CU\output`. Takes go in `units/<TAKE>/`, with the prompt saved beside the take, and stills in `stills/<ID>/`. The SaveVideo prefix is the footage folder relative to output plus `units/<TAKE>/<TAKE>`.
 
 ## 3. ComfyUI API recipe (browser JavaScript)
 
@@ -57,7 +57,7 @@ Record new H3 findings in `docs/notes/` in this repo.
   - In the studio, queue only what the project's approval policy allows. The `comfy-bridge` skill and the guardrail hooks check it before each submit.
 - **Monitor.** Poll `/api/history/<id>` (`status.status_str`, `outputs`) and `/api/queue`, from the shell; the page's `progress` event via `app.api.addEventListener` also works while the tab is connected. Don't poll faster than every few minutes for long H3 jobs.
   - Progress messages go only to the client that queued the job (the studio tab). The shell-side watchdog follows ComfyUI's console log instead (`vram-watch` skill).
-- **Long text** (prompts): write the .txt directly to disk under the output folder (studio: `C:\CU\output\studio\<CODE>\…`). Read it in the page with `fetch('/api/view?filename=..&subfolder=..&type=output').then(r=>r.text())`, rather than pasting it into JavaScript.
+- **Long text** (prompts): write the .txt directly to disk under the output folder (studio: the project's footage folder). Read it in the page with `fetch('/api/view?filename=..&subfolder=..&type=output').then(r=>r.text())`, rather than pasting it into JavaScript.
 - **Images.** Fetch them from `/api/view` (type=output) as a blob and upload with POST `/api/upload/image` (FormData `image`, `subfolder`, `type=input`, `overwrite=true`). Reference them as `subfolder/name`.
 - **Anything Everywhere and similar broadcast nodes** don't show up in graphToPrompt. Connect those inputs yourself (see the Krea section). Frontend-only seed randomizers (easy globalSeed, rgthree) don't run over the API, so set seeds explicitly.
 - **Save locations.** The SaveVideo `filename_prefix` is relative to output, e.g. `video/Reruns/<Folder>/<Folder>_15s`. Image Saver uses `path` plus `filename`.
@@ -79,7 +79,12 @@ Record new H3 findings in `docs/notes/` in this repo.
 - **Speed configuration** (user suggestion, used from `H3ultRefsTest2` onward; check the timing on the first run): the model chain is 127 UNET → 152 preview → 187 ModelAttentionBackend "comfy kitchen attention" (on) → 159 PathchSageAttentionKJ (bypassed) → 158 MiniMaxChunkFeedForward chunks 2 / seq_threshold 4096 (on) → 155 MiniMaxLowVRAMAttention head_chunks 4 (on) → 153 MiniMaxH3MemoryEfficientSageAttentionPatch (bypassed). Set node modes 0 = on and 4 = bypass in the UI JSON.
 - The node accepts up to 9 pictures, 3 videos (never use them) and 3 audios. "max" ref size (2048 short edge) costs time with several refs; "match" is the faster option if VRAM or time becomes a problem.
 - **Attention profiles** (user decision 2026-10-09).
-  - All H3 workflows share one model chain with the same node IDs: 127 UNET → 152 preview (taeh3, the live preview the user watches) → 187 ModelAttentionBackend → 159 PathchSageAttentionKJ → 158 MiniMaxChunkFeedForward → 155 MiniMaxLowVRAMAttention → 153 MemoryEfficientSageAttentionPatch → 154 LoRA → 190 BlockSparseAttention → 193 → sampler.
+  - Each project's H3 templates are chosen by the user, and each template's manifest records its sol-attn node and chunking nodes. The sol node's own settings come from the template as saved.
+  - Two sol nodes are in use:
+    - ComfyUI's built-in "Model Sparse Attention" (`BlockSparseAttention`, method sol-attn: tau 1.3, start 0.2, end 1.0, min_tokens 12288);
+    - the custom "Patch Sol-Attn" (`SolAttnPatch`, `ComfyUI-SolAttn_triton`). The user's setup on 2026-10-09: tau 1.30, start 0.20, end 0.90, min_tokens 4096, int8_qk true, sink exact_kv_and_rows, morton true, 2d_frame.
+  - If a template has no sol node, ask the user before using it.
+  - The H3ult/regenruns family shares one model chain with the same node IDs: 127 UNET → 152 preview (taeh3, the live preview the user watches) → 187 ModelAttentionBackend → 159 PathchSageAttentionKJ → 158 MiniMaxChunkFeedForward → 155 MiniMaxLowVRAMAttention → 153 MemoryEfficientSageAttentionPatch → 154 LoRA → 190 BlockSparseAttention → 193 → sampler.
   - A profile is a set of node modes, applied in the page before graphToPrompt (§3):
     - **`sol` (default for every H3 job):** 187 and 190 on; 153, 155, 158 and 159 bypassed. This is H3ultSingleRefSparse as saved. Its time and VRAM peak are not measured yet; plan with the measured non-sol numbers above as the upper bound until a smoke test measures them.
     - **`chunked` (fallback when the user reports low quality or VRAM fills):** 187, 155 and 158 on; 153, 159 and 190 bypassed. This is H3ultRefsTest2 as saved.
@@ -173,7 +178,11 @@ Reference analysis (two HSR ultimates, about 10 s each, real-time engine at 60 f
 
 ## 9. Batch reruns (`output/video/Reruns`)
 
-Standalone gacha work, outside the studio. `output/video/Reruns` and `input/reruns` lie outside the studio's write folders, so writing prompt files there needs the user's approval for each batch. Sheet uploads go through ComfyUI's `/api/upload/image` from the page, as in §3.
+Gacha rerun batches. Each batch is defined like a project (user decision 2026-10-09):
+- When the batch is defined, ask the user where to create its new footage folder. It must be inside `C:\CU\output`.
+- That folder becomes one of the write folders. The existing `output/video/Reruns` folders are read-only sources (character sheets, original prompts).
+- Sheet uploads go through ComfyUI's `/api/upload/image` from the page, as in §3.
+- In the steps below, read "the batch's footage folder" wherever `Reruns/<Folder>` is the output.
 
 - Each folder holds a character sheet (`*.png~tplv-...-image.png`) and `prompt.txt` / `prompt2.txt` (10 s originals).
 - For each folder:

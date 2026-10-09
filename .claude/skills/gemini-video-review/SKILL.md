@@ -15,7 +15,7 @@ Gemini watches every sampled frame and hears the audio, so it is fast and thorou
 ## 1. Before running anything
 
 **Files.** Claude Code's shell runs on the user's PC, so use real paths:
-- `C:\CU\output\studio\<CODE>\units\…` for studio takes;
+- `<footage folder>\units\…` for studio takes (the project's footage folder, recorded in its `00_admin/approvals/policy.json`);
 - `C:\CU\output\video\…` for earlier clips.
 
 Never read from D:. If a file is somewhere this session can't reach, say so plainly. Don't build a workaround through an unrelated app such as a video editor's script menu; it is fragile and hard for the user to repeat.
@@ -24,7 +24,7 @@ Never read from D:. If a file is somewhere this session can't reach, say so plai
 - for a studio take: `projects/<CODE>/06_dailies/<TAKE>/` (reports) and `…/sheets/` (contact sheets);
 - outside a project: Claude Code's scratch folder.
 
-The studio may write only inside this repo and `C:\CU\output\studio`.
+The studio may write only inside this repo and each project's footage folder.
 
 **Network.** The script calls `https://generativelanguage.googleapis.com` directly from this PC.
 

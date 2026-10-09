@@ -65,10 +65,12 @@ C:\CU\output\studio\<CODE>\units\   ComfyUI writes takes here (created in Phase 
 - `templates/project/00_admin … 10_wrap`: `tracker.json`, `budget.json`, `notes.md`, `decisions.md`, `run_tickets/`, empty `render_log.jsonl` and `vram_log.jsonl`, and `01_brief/brief.md` and `project.yaml` skeletons.
 - `pipeline/tools/new_project.py` (template → `projects/<CODE>`), `pipeline/tools/validate.py` (checks a project against the schemas), and `pipeline/constants.json`.
 
-**Step 6: ComfyUI bridge, read-only.** List the workflows. Open them in a ComfyUI tab, convert them with graphToPrompt and write, for each of H3regenrunsTest, H3ultRefsTest2 and H3regensElements:
-- `manifests/<id>.json`: per-job parameters with node IDs and input names, seed node, broadcast inputs to wire, outputs, measured costs.
+**Step 6: ComfyUI bridge, read-only.** List the workflows and build the manifest tooling. A project's workflow templates (3.H) are turned into manifests when the project is initialized. Step 6 proves the tooling read-only on H3regenrunsTest, H3ultRefsTest2 and H3regensElements: it opens each in the studio's ComfyUI tab, converts it with graphToPrompt and writes:
+- `manifests/<id>.json`: per-job parameters with node IDs and input names, seed node, broadcast inputs to wire, the sol and chunking nodes for H3, outputs, measured costs.
 - `profiles/<id>.default.json`: every other value, as you saved it.
 - `snapshots/<id>/<date>_<hash>.api.json`.
+
+These three become the first entries in the manifest library. They are not defaults.
 
 Plus `bridge/comfy_api.py` (status, queue, history, free, outputs, logs; no submit until step 8's check exists), `bridge/page_recipes.js` and `skills/comfy-bridge/SKILL.md`. Nothing is queued.
 
@@ -135,10 +137,16 @@ Plus `bridge/comfy_api.py` (status, queue, history, free, outputs, logs; no subm
 *Proposal (how decision 2 is enforced):* approvals and the project's approval policy come only from your answers in chat. The Producer asks with a question that names the ticket and the window. A `PostToolUse` hook records your answer to `00_admin/approvals/` (`policy.json` and `R-###.json`). A `PreToolUse` hook blocks every agent write to that folder. The submit hook, the bridge and the watchdog all trust only those records plus the clock.
 *Fallback,* if the Desktop app doesn't pass answers to hooks: you run one approve command in your own terminal.
 
-**G. Write allowlist.** The design allows writes only to the repo and `C:\CU\output\studio`. That would also block Claude Code's own scratch folder (`%TEMP%\claude\…`) and this project's memory folder (`~\.claude\projects\C--claude-video-agent-studio\memory`).
+**G. Write allowlist.** The design allows writes only to the repo and `C:\CU\output\studio`. The studio folder is replaced by each project's footage folder (G2). That would also block Claude Code's own scratch folder (`%TEMP%\claude\…`) and this project's memory folder (`~\.claude\projects\C--claude-video-agent-studio\memory`).
 *Approved 2026-10-09:* allow those two as well. The hooks also guard the Gemini key file, which the KICKOFF rules require but step 8 doesn't list.
 
-**H. Workflows (decided 2026-10-09, see the end of this section).** All three named workflows are present (last saved 5 Oct). Newer H3 workflows exist too: H3ultRefsTest3, H3ultSingleRef, H3ultSingleRefSparse, H3ult_Solenne_v3–v5 and H3ult_Xiaoyu_v1–v3.
+**G2. A footage folder per project (decided 2026-10-09).**
+- Every project, a rerun batch included, gets its own footage folder for everything ComfyUI renders for it: H3 takes and Krea stills.
+- When the project is defined, the Producer asks you where to create it, and creates it only after you answer. The answer is recorded with the project's policy (F2), so no agent can redirect writes. The allowed write roots are then: the repo, each project's recorded footage folder, Claude Code's scratch folder and this project's memory folder.
+- *Constraint:* the folder must be inside `C:\CU\output`, because ComfyUI refuses to save anywhere else (`folder_paths.py:552`, "Saving image outside the output folder is not allowed"). ComfyUI.bat doesn't change the output directory. Never on D:. `C:\CU\output\studio\<CODE>` is offered as the suggestion.
+- Layout inside it: `units/<TAKE>/` for H3 takes (with the prompt beside each take), `stills/<ID>/` for Krea sheets and keyframes.
+
+**H. Workflows (decided 2026-10-09, revised the same day; see the end of this section).** All three named workflows are present (last saved 5 Oct). Newer H3 workflows exist too: H3ultRefsTest3, H3ultSingleRef, H3ultSingleRefSparse, H3ult_Solenne_v3–v5 and H3ult_Xiaoyu_v1–v3.
 
 What a manifest is: for one saved workflow, it lists which values the studio may change per job (prompt, reference images, seed, duration, output path) and declares every other value to be yours. It also records how long the configuration takes and how much VRAM it needs. Only workflows with a manifest can be used by the studio.
 
@@ -158,17 +166,14 @@ Points for you:
 - The newest setup turns BlockSparseAttention (sol-attn) on. Standing rule 1 in h3-gacha-pipeline says not to use sol-attn for high-motion work. Which one is current?
 - The newest setup has no measured time or VRAM peak in the docs. Today's ComfyUI logs show two runs with the pruned model (17:40 and 17:45). Neither finished: the first was interrupted, and the second log stops after the model load, before ComfyUI was restarted at 18:00.
 - A manifest is per configuration, not per file: the H3ultRefsTest3 and SingleRef files would be jobs on an existing manifest, not new workflows.
-*Decided 2026-10-09:*
-- H3regensElements, H3regenrunsTest and H3ultRefsTest2 are the **default** workflows, and step 6 writes their manifests and default profiles.
-- You can request any change at any time:
-  - a different value in a default (it shows as a diff against the default profile in the next run request);
-  - another workflow for a project or a job;
-  - a new default.
-- For a workflow that has no manifest yet, the Pipeline TD first writes one from your saved file. It is marked unmeasured until a smoke test in an approved window measures it.
-- The Producer's intake asks which workflows a project should use, and offers the defaults.
-- The sparse/pruned setup (Solenne_v5, Xiaoyu_v3, with the pruned int8 model at 1.4 MP) is available on request like any other workflow.
+*Decided 2026-10-09 (revised):*
+- There are **no global default workflows**. For each project you name the workflow templates it uses: saved ComfyUI workflows, e.g. one Krea template for stills and one or more H3 templates.
+- If none are named when the project is initialized, the Producer prompts you to define them. Nothing is queued for a project without templates.
+- At project initialization the Pipeline TD makes a manifest and a default profile from each template, as you last saved it, and keeps them in the manifest library (`pipeline/comfy/manifests/`) for reuse.
+- A new template is marked unmeasured until a smoke test in an approved window measures it.
+- You can change a project's templates, or request any value change, at any time. A change shows as a diff against the template's default profile in the next run request.
 
-**H2. Attention profile for H3 (decided 2026-10-09).** sol-attn (BlockSparseAttention) is the default for every H3 job, for speed. It applies to H3 video generation only, never to Krea. This replaces standing rule 1 in h3-gacha-pipeline ("no sol-attn for high-motion work"); step 3 updates the skill.
+**H2. Attention profile for H3 (decided 2026-10-09).** sol-attn is the default for every H3 job, for speed. It applies to H3 video generation only, never to Krea. This replaces standing rule 1 in h3-gacha-pipeline ("no sol-attn for high-motion work"); step 3 updates the skill.
 - All H3 workflows share one model chain with the same node IDs: 127 UNET → 152 preview → 187 kitchen attention → 159 Sage KJ → 158 chunked feed-forward → 155 LowVRAM attention → 153 memory-efficient Sage → 154 LoRA → 190 BlockSparseAttention → 193 → sampler. A profile is a set of node modes there:
 
 | Profile | On | Bypassed | Matches |
@@ -177,6 +182,10 @@ Points for you:
 | `chunked` (fallback) | 187, 155, 158 | 153, 159, 190 | H3ultRefsTest2 as you saved it |
 | `sage` (as saved in H3regenrunsTest) | 159, 153 | 155, 158, 187, 190 | H3regenrunsTest as you saved it |
 
+- Profiles are defined per manifest. Each H3 manifest records which node in its template is the sol-attn node and which are the chunking nodes, because templates can differ. Two sol-attn nodes are in use:
+  - ComfyUI's built-in **Model Sparse Attention** (`BlockSparseAttention`, node 190 in the H3ult/regenruns family): tau 1.3, start 0.2, end 1.0, min_tokens 12288, extra_tokens 256, sink exact_kv_and_rows.
+  - The custom **Patch Sol-Attn** (`SolAttnPatch` from `ComfyUI-SolAttn_triton`), as in your screenshot of 2026-10-09: tau 1.30, start 0.20, end 0.90, min_tokens 4096, int8_qk true, sink exact_kv_and_rows, morton true, morton_curve 2d_frame, use_tma false. Of the saved files, only `ref2va.json` has exactly these values.
+- The sol node's own settings come from the template as you saved it. If an H3 template has no sol-attn node, the Producer asks you before using it.
 - The profile is applied in the studio's ComfyUI tab before graphToPrompt. Your saved workflow files are never changed.
 - **Fallback:** when you report low quality, or VRAM fills (a watchdog halt, or a peak at the limit), the studio switches that project's H3 jobs to `chunked` without a new approval. It records the switch as a decision and reports it.
 - `sol` has no measured time or VRAM peak yet. Until the first smoke test measures it, budgets use the measured non-sol numbers (22–33 min per unit) as the upper bound.
@@ -202,7 +211,7 @@ Points for you:
 **M. Long GPU jobs vs agent turns.** H3 jobs take 22–33 minutes, and an agent can't sit in one turn that long cheaply. The bridge gets a `wait` command (blocking, at most 10 minutes per call) and the watchdog log. How the Render Wrangler paces a 3-hour window is designed in Phase 2.
 
 **N. Other.**
-- `C:\CU\output\studio` doesn't exist yet. Phase 1 doesn't need it; I'll ask before creating it.
+- No footage folder exists yet. Each one is created at project definition, where you choose it (G2).
 - Drives E: and F: exist and aren't mentioned in the design. Reads from them stay allowed; writes are blocked like everything outside the allowed roots.
 
 ## 4. Decisions needed
@@ -213,5 +222,6 @@ Your "OK" accepts the proposals as written. Change any of them by number:
 2. ~~Approval policy (3.F).~~ Decided: you define it per project at intake.
 3. ~~The write allowlist plus scratch and memory folders (3.G).~~ Approved.
 4. ~~A dedicated studio ComfyUI tab (3.D).~~ Approved. Jobs run in that tab, so that is where you watch progress and the preview node.
-5. ~~Which workflows get manifests (3.H).~~ Decided: the three are defaults, and you can request any change.
+5. ~~Which workflows get manifests (3.H).~~ Decided: you give workflow templates per project, and the Producer prompts for them at project initialization if they're missing.
+7. ~~Footage location (3.G2).~~ Decided: you choose a footage folder for each project when it is defined.
 6. ~~Port four skills now; the h3 split later (3.J).~~ Approved.

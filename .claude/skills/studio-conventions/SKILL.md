@@ -9,7 +9,11 @@ The rules in `CLAUDE.md` come first. This skill is how the agents work together 
 
 ## Files are the source of truth
 
-- Everything for a film lives in `projects/<CODE>/` (layout in `CLAUDE.md`). Takes rendered by ComfyUI live in `C:\CU\output\studio\<CODE>\units\` and the tracker points to them.
+- Everything for a film lives in `projects/<CODE>/` (layout in `CLAUDE.md`).
+- What ComfyUI renders lives in the project's **footage folder**. The user chose it at project definition, and it is recorded as `footage_folder` in `00_admin/approvals/policy.json`. The tracker points to the files there:
+  - H3 takes in `<footage>/units/<TAKE>/`, with the prompt saved beside each take;
+  - Krea stills in `<footage>/stills/<ID>/`.
+- ComfyUI's SaveVideo and Image Saver paths are relative to `C:\CU\output`. For example, with the footage folder `C:\CU\output\studio\MAG`, a take's prefix is `studio/MAG/units/MAG_SQ010_U020_v001/MAG_SQ010_U020_v001`.
 - Hand over **paths and IDs, never pasted content**. To point inside a file, use a fragment: `04_boards/shotlist.json#MAG_SQ010_U020`.
 - Never overwrite a versioned file. Write the next version (`v002`, `v003`, …) and leave the old one.
 - Logs (`render_log.jsonl`, `vram_log.jsonl`) are append-only: one JSON object per line.
@@ -89,7 +93,12 @@ T0 and T1 go straight into the next cut. T2 and up spend GPU time and follow the
 
 ## Run tickets and approvals
 
-- **Policy.** The user defines the approval process for each project at intake. It is recorded in `00_admin/approvals/policy.json` from the user's own answer. Until it exists, nothing runs in ComfyUI without an approved ticket and an open window.
+- **Project definition.** At intake the user defines three things, recorded in `00_admin/approvals/policy.json` from the user's own answers:
+  - the approval policy;
+  - the workflow templates (saved ComfyUI workflows; there are no global defaults, so prompt for them if they're missing);
+  - the footage folder.
+
+  Until the record exists, nothing runs in ComfyUI for the project without an approved ticket and an open window. Each template gets a manifest in `pipeline/comfy/manifests/` at project initialization.
 - **Ticket.** The Producer writes a proposed ticket to `00_admin/run_tickets/R-###.json` (schema `run_ticket.schema.json`): the jobs, each workflow and its configuration (changes shown as a diff against the default profile), estimated GPU minutes, VRAM risk, and the proposed window.
 - **Approval.** The Producer asks the user, naming the ticket and the window. The user's answer is recorded by a hook to `00_admin/approvals/R-###.json`. Agents never write anything under `00_admin/approvals/` and never treat a ticket as approved without that record.
 - **Window.** Nothing starts after the window ends. A job that cannot finish before the end waits for the next window.
