@@ -62,7 +62,8 @@ Work through `KICKOFF.md` Phase 1 one step at a time. After each step, show what
 | Shells | Windows PowerShell 5.1 (no pwsh 7) and Git Bash. Hook scripts use 5.1 syntax. |
 | DaVinci Resolve | 21.0.4.5 free at `C:\DavinciResolve`. Start it manually, open a project, then run Workspace ▸ Scripts ▸ resolve_bridge once per session. |
 | Resolve MCP | samuelgursky/davinci-resolve-mcp 4.8.22 with `RESOLVE_SCRIPT_LIB=C:\DavinciResolve\fusionscript.dll` |
-| video-use | user-level skill at `~\.claude\skills\video-use` |
+| video-use | User-level skill at `~\.claude\skills\video-use`, with its own venv (`.venv\Scripts\python.exe` there). It is the ffmpeg editing route, music-video mode. The Nhato "Magic" edit used it. The `video-use-studio` skill has the studio's rules for it. |
+| `~\motion` | The shared Remotion/3D project and the CC0 asset library. Read-only for the studio (user decision 2026-10-10). |
 | Claude Code | `C:\Users\david\.local\bin\claude.exe` |
 
 ## Repo layout
@@ -71,11 +72,12 @@ Work through `KICKOFF.md` Phase 1 one step at a time. After each step, show what
 CLAUDE.md, .mcp.json
 .claude\agents\         the 15 studio agents (producer.md … librarian.md)
 .claude\skills\         studio-conventions, h3-gacha-pipeline, gemini-video-review,
-                        resolve-music-video, resolve-edit, comfy-bridge, vram-watch
+                        resolve-music-video, resolve-edit, comfy-bridge, vram-watch,
+                        video-use-studio (video-use itself is a user-level skill)
 .claude\hooks\          guardrail hooks (PowerShell 5.1)
 docs\                   design spec, Phase 1 plan, measured notes
 pipeline\               schemas\, comfy\ (manifests, profiles, snapshots, bridge),
-                        watchdog\, tools\, tests\, constants.json
+                        watchdog\, tools\ (incl. from_magic\ references), tests\, constants.json
 templates\project\      00_admin … 10_wrap
 projects\<CODE>\        one folder per film, made from the template
 ```

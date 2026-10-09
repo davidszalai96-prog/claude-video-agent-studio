@@ -65,6 +65,17 @@ def test_footage_folder_becomes_writable_only_after_approval(repo):
     assert guard(repo, "Write", {"file_path": target, "content": "x"})[0] == 2
 
 
+def test_motion_folder_is_read_only_for_the_studio(repo):
+    # User decision 2026-10-10: video-use slots never write in ~/motion (Remotion only inside a slot folder).
+    slot = os.path.join(os.environ["USERPROFILE"], "motion", "remotion", "src", "slots", "MAG_x.tsx")
+    assert guard(repo, "Write", {"file_path": slot, "content": "x"})[0] == 2
+    mag = new_project.create("MAG", "Magic", "film", repo / "projects")
+    record_policy_approval(mag, POLICY)
+    cmd = "cp " + os.path.join(os.environ["USERPROFILE"], "motion", "assets", "hdri.exr").replace("\\", "/") + \
+          " C:/CU/output/studio/MAG/edit/animations/slot_1/assets/hdri.exr"
+    assert guard(repo, "Bash", {"command": cmd})[0] == 0  # copying an asset into a slot is fine
+
+
 def test_approvals_and_secrets_are_never_written_by_tools(repo):
     assert guard(repo, "Write", {"file_path": str(repo / "projects" / "MAG" / "00_admin" / "approvals" / "R-001.json"), "content": "{}"})[0] == 2
     assert guard(repo, "Write", {"file_path": str(repo / ".env"), "content": "K=1"})[0] == 2

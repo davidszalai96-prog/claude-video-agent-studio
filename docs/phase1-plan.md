@@ -305,6 +305,24 @@ Points for you:
 - No footage folder exists yet. Each one is created at project definition, where you choose it (G2).
 - Drives E: and F: exist and aren't mentioned in the design. Reads from them stay allowed; writes are blocked like everything outside the allowed roots.
 
+**O. video-use, the second editor route (decided 2026-10-10).**
+- **Why.** The Nhato "Magic" edit (`C:\CU\output\video\Nhato Magic - Video-edit`) was cut with the user's customized video-use. In that folder's session it is mentioned 152 times, against 17 for Resolve.
+- **What video-use has.** Its music-video mode covers much of the Editor's and Finishing's work on H3 footage:
+  - `beats.py`, `shots.py`, `beatmap.py`;
+  - `render.py` with punch, pulse, flash and speed;
+  - `audio_frames.py` for animations;
+  - HyperFrames and Remotion slots.
+- **Decisions:**
+  - Editor, Finishing and Music & Timing preload `video-use` plus the new `video-use-studio` skill (the studio's rules for it), and get the Skill tool, so they can load the HyperFrames or Remotion skills when a slot needs them.
+  - `C:\Users\david\motion` stays read-only for the studio. Remotion is allowed only as a project scaffolded inside a slot folder in the project's footage folder.
+  - Magic's own tools (`edit/tools/*.py`) and Gemini prompts are copied unchanged into `pipeline/tools/from_magic/` as references for the Pipeline TD. They have no keys and no lyrics, and they contain hard-coded Magic paths.
+- **How it fits:**
+  - video-use works in `<footage folder>\edit\`, which is inside the write roots.
+  - The studio EDL in `07_edit/` stays the record at every version. A video-use EDL → studio EDL converter is Phase 5 work.
+  - Its "confirm the strategy" rule is met through the Director and the user's gates.
+  - No Scribe transcription for music videos.
+  - No final or animation renders during an H3 window.
+
 ## 4. Decisions needed
 
 Your "OK" accepts the proposals as written. Change any of them by number:

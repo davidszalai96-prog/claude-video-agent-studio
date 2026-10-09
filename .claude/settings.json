@@ -20,7 +20,9 @@
       "Bash(nvidia-smi *)",
       "PowerShell(nvidia-smi *)",
       "Bash(ffprobe *)",
-      "PowerShell(ffprobe *)"
+      "PowerShell(ffprobe *)",
+      "Read(~/.claude/skills/video-use/**)",
+      "Read(~/motion/**)"
     ],
     "ask": [
       "Bash(git push *)",
