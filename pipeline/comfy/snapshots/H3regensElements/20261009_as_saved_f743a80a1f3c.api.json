@@ -1,0 +1,1005 @@
+{
+  "template": "H3regensElements",
+  "label": "as_saved",
+  "profile": null,
+  "ui_sha256": "9def8cf4dcf1ad022c6165c136d290b9082bcd9180703c7574aa25d2232d70c8",
+  "comfy_version": "0.37.0",
+  "frontend_version": "1.53.6",
+  "converted_at": "2026-10-09T21:39:50.403Z",
+  "config_hash": "f743a80a1f3c5f51a7c65f9705682bb79f1559c8998ff4e3c90693cf696b0bd4",
+  "nodes": 58,
+  "api_prompt": {
+    "1": {
+      "inputs": {
+        "anything": [
+          "5",
+          0
+        ]
+      },
+      "class_type": "Anything Everywhere",
+      "_meta": {
+        "title": "Anything Everywhere"
+      }
+    },
+    "2": {
+      "inputs": {
+        "unet_name": "krea2_turbo_fp8.safetensors",
+        "weight_dtype": "default"
+      },
+      "class_type": "UNETLoader",
+      "_meta": {
+        "title": "Load Diffusion Model"
+      }
+    },
+    "5": {
+      "inputs": {
+        "vae_name": "qwen_image_vae.safetensors"
+      },
+      "class_type": "VAELoader",
+      "_meta": {
+        "title": "Load VAE"
+      }
+    },
+    "6": {
+      "inputs": {
+        "clip_name": "qwen3vl_4b_fp8_scaled.safetensors",
+        "type": "krea2",
+        "device": "default"
+      },
+      "class_type": "CLIPLoader",
+      "_meta": {
+        "title": "Load CLIP"
+      }
+    },
+    "7": {
+      "inputs": {
+        "anything": [
+          "6",
+          0
+        ]
+      },
+      "class_type": "Anything Everywhere",
+      "_meta": {
+        "title": "Anything Everywhere"
+      }
+    },
+    "8": {
+      "inputs": {
+        "any_02": [
+          "13",
+          1
+        ]
+      },
+      "class_type": "Any Switch (rgthree)",
+      "_meta": {
+        "title": "Any Switch (rgthree)"
+      }
+    },
+    "9": {
+      "inputs": {
+        "any_02": [
+          "13",
+          0
+        ]
+      },
+      "class_type": "Any Switch (rgthree)",
+      "_meta": {
+        "title": "Any Switch (rgthree)"
+      }
+    },
+    "11": {
+      "inputs": {
+        "width": [
+          "9",
+          0
+        ],
+        "height": [
+          "8",
+          0
+        ],
+        "batch_size": 1
+      },
+      "class_type": "EmptyLatentImage",
+      "_meta": {
+        "title": "Empty Latent Image"
+      }
+    },
+    "13": {
+      "inputs": {
+        "mode": "Manual",
+        "latent_type": "latent_4x8",
+        "width": "<per_job:width>",
+        "height": "<per_job:height>",
+        "auto_detect": false,
+        "rescale_mode": "resolution",
+        "rescale_value": 1,
+        "batch_size": 0
+      },
+      "class_type": "ResolutionMaster",
+      "_meta": {
+        "title": "Resolution Master"
+      }
+    },
+    "21": {
+      "inputs": {
+        "PowerLoraLoaderHeaderWidget": {
+          "type": "PowerLoraLoaderHeaderWidget"
+        },
+        "lora_1": {
+          "on": false,
+          "lora": "Krea2\\krea2filterbypass3.safetensors",
+          "strength": 2
+        },
+        "lora_2": {
+          "on": false,
+          "lora": "Krea2\\KNPV3_1.safetensors",
+          "strength": 1
+        },
+        "lora_3": {
+          "on": false,
+          "lora": "Krea2\\T-L-800_000003200.safetensors",
+          "strength": 1
+        },
+        "lora_4": {
+          "on": false,
+          "lora": "Krea2\\realism_engine_krea2_v2.safetensors",
+          "strength": 0.6
+        },
+        "lora_5": {
+          "on": false,
+          "lora": "Krea2\\krea2-masterpieces-v51.safetensors",
+          "strength": 1
+        },
+        "lora_6": {
+          "on": false,
+          "lora": "Krea2\\size_krea2_loraholic.safetensors",
+          "strength": 4
+        },
+        "lora_7": {
+          "on": false,
+          "lora": "Krea2\\SBEve-800_000003000.safetensors",
+          "strength": 1
+        },
+        "lora_8": {
+          "on": false,
+          "lora": "Krea2\\krea2-fake-b.safetensors",
+          "strength": 1
+        },
+        "lora_9": {
+          "on": false,
+          "lora": "Krea2\\BSlider-KREA2.safetensors",
+          "strength": 1
+        },
+        "lora_10": {
+          "on": false,
+          "lora": "Krea2\\k2_nice_body.safetensors",
+          "strength": 0.8
+        },
+        "lora_11": {
+          "on": false,
+          "lora": "Krea2\\Flat_anime_Krea_@.safetensors",
+          "strength": 0.5
+        },
+        "lora_12": {
+          "on": false,
+          "lora": "Krea2\\BArtstyle-KREA2-V1-1.safetensors",
+          "strength": 1
+        },
+        "lora_13": {
+          "on": false,
+          "lora": "Krea2\\berserk_krea2.safetensors",
+          "strength": 0.3
+        },
+        "lora_14": {
+          "on": false,
+          "lora": "Krea2\\betabeet-k2-4_c1-st6000.safetensors",
+          "strength": 1
+        },
+        "lora_15": {
+          "on": false,
+          "lora": "Krea2\\AIIllustOjisan_Krea2_v01.safetensors",
+          "strength": 1
+        },
+        "lora_16": {
+          "on": false,
+          "lora": "Krea2\\MoriiMee_Krea_epoch_10.safetensors",
+          "strength": 0.4
+        },
+        "lora_17": {
+          "on": false,
+          "lora": "Krea2\\MysticX_KREA2_v2.safetensors",
+          "strength": 1
+        },
+        "lora_18": {
+          "on": false,
+          "lora": "Krea2\\granblue_1138_detail_l_black_bg_krea2_lora-000008.safetensors",
+          "strength": 0.7
+        },
+        "lora_19": {
+          "on": false,
+          "lora": "Krea2\\meion_krea2_style_v7.0_c1-st4000.safetensors",
+          "strength": 1
+        },
+        "lora_20": {
+          "on": false,
+          "lora": "Krea2\\onineko_k2_v1.safetensors",
+          "strength": 1
+        },
+        "lora_21": {
+          "on": false,
+          "lora": "Krea2\\Cutesexyrobutts Krea.safetensors",
+          "strength": 1
+        },
+        "lora_22": {
+          "on": false,
+          "lora": "Krea2\\Wuwa_OC_Cinematic.safetensors",
+          "strength": 1
+        },
+        "➕ Add Lora": "",
+        "model": [
+          "2",
+          0
+        ]
+      },
+      "class_type": "Power Lora Loader (rgthree)",
+      "_meta": {
+        "title": "Power Lora Loader (rgthree)"
+      }
+    },
+    "45": {
+      "inputs": {
+        "source": [
+          "56:54",
+          0
+        ]
+      },
+      "class_type": "PreviewAny",
+      "_meta": {
+        "title": "Final prompt"
+      }
+    },
+    "46": {
+      "inputs": {
+        "value": "<per_job:prompt>"
+      },
+      "class_type": "PrimitiveStringMultiline",
+      "_meta": {
+        "title": "POSITIVE PROMPT"
+      }
+    },
+    "63": {
+      "inputs": {
+        "value": 1027023787557056,
+        "mode": true,
+        "action": "randomize",
+        "last_seed": 1019391168871819
+      },
+      "class_type": "easy globalSeed",
+      "_meta": {
+        "title": "EasyGlobalSeed"
+      }
+    },
+    "75": {
+      "inputs": {
+        "image": [
+          "96",
+          0
+        ]
+      },
+      "class_type": "easy imageSize",
+      "_meta": {
+        "title": "ImageSize"
+      }
+    },
+    "92": {
+      "inputs": {
+        "rgthree_comparer": {
+          "images": [
+            {
+              "name": "A",
+              "selected": true,
+              "url": "/api/view?filename=rgthree.compare._temp_lfipm_00003_.png&type=temp&subfolder=&rand=0.7620196264705525"
+            },
+            {
+              "name": "B",
+              "selected": true,
+              "url": "/api/view?filename=rgthree.compare._temp_lfipm_00004_.png&type=temp&subfolder=&rand=0.44960259099346256"
+            }
+          ]
+        },
+        "image_a": [
+          "109:99",
+          0
+        ],
+        "image_b": [
+          "195",
+          0
+        ]
+      },
+      "class_type": "Image Comparer (rgthree)",
+      "_meta": {
+        "title": "Image Comparer (rgthree)"
+      }
+    },
+    "96": {
+      "inputs": {
+        "any_01": [
+          "109:99",
+          0
+        ],
+        "any_02": [
+          "195",
+          0
+        ]
+      },
+      "class_type": "Any Switch (rgthree)",
+      "_meta": {
+        "title": "Any Switch (rgthree)"
+      }
+    },
+    "128": {
+      "inputs": {
+        "seed": "<per_job:seed>"
+      },
+      "class_type": "Seed",
+      "_meta": {
+        "title": "Seed"
+      }
+    },
+    "134": {
+      "inputs": {
+        "text": "redcraft23INT8INT4FP8_30Krea2:f6088960c0,manual1:E25D42BE080B",
+        "anything": [
+          "156:155",
+          0
+        ]
+      },
+      "class_type": "easy showAnything",
+      "_meta": {
+        "title": "ASSET HASHES"
+      }
+    },
+    "138": {
+      "inputs": {
+        "id": 21,
+        "widget_name": "",
+        "return_all": true,
+        "node_title": "",
+        "allowed_float_decimals": 2
+      },
+      "class_type": "WidgetToString",
+      "_meta": {
+        "title": "Power LoRA loader"
+      }
+    },
+    "144": {
+      "inputs": {
+        "node_id": "2",
+        "input_name": "unet_name"
+      },
+      "class_type": "Workflow Input Value (Image Saver)",
+      "_meta": {
+        "title": "MODEL"
+      }
+    },
+    "149": {
+      "inputs": {
+        "text": "Full-body character concept art of a male anime technical specialist aged 26, an anthropomorphic interpretation of Claude. Arknights: Endfield-inspired science-fiction gacha character aesthetic: refined anime features, believable adult proportions, layered industrial clothing, precise cel shading blended with soft volumetric lighting, detailed fabric and matte hardware.\n\nHe has a lean build, thin round dark-metal glasses, half-lidded gray-green eyes, pronounced dark circles beneath his eyes, and a faint knowing smile. His youthful face looks sleep-deprived, quietly intelligent and approachable. Rounded shoulders, upper back curved forward, neck leaning slightly forward, relaxed knees: the habitual slouch of an overworked programmer.\n\nHis messy medium-short hair is muted terracotta orange, base color #D97757. Broad separated locks radiate irregularly outward from the crown, creating a recognizable soft sunburst silhouette inspired by the Claude logo. Unequal lengths, thick rounded blunt tips, fluffy strand texture, a few drooping locks over the forehead. The radial shape is formed entirely by natural-looking hair.\n\nHe wears an oversized charcoal technical field jacket with stone-gray panels and an asymmetric hem over a rumpled ivory button-up shirt and loosely knotted narrow black tie. Unevenly pushed-up sleeves, a clipped ID badge, tapered slate utility trousers and worn black utility sneakers. Restrained terracotta stitching accents.\n\nHis left upper arm holds one closed graphite laptop snugly against his ribs beneath his armpit, while his left hand supports its lower edge. His right hand holds one ivory takeaway coffee cup upright near his waist.\n\nA palm-sized terracotta robot companion sits securely on his right shoulder. Its silhouette resembles the blocky Claude Code mascot: a wide rectangular body, two vertical ivory rectangular eyes, one short rectangular arm projecting from each side, and four short rectangular legs arranged in two pairs. Simple crisp geometry, subtle physical depth, matte shell.\n\nSingle character, relaxed three-quarter view, entire body and feet visible, both props clearly readable. Vertical 2:3 composition, pale warm-gray studio background, soft neutral lighting, restrained colors, polished game character presentation, no lettering or watermark. ",
+        "anything": [
+          "156:133",
+          0
+        ]
+      },
+      "class_type": "easy showAnything",
+      "_meta": {
+        "title": "FORMATED PROMPT"
+      }
+    },
+    "187": {
+      "inputs": {
+        "seed": "<per_job:seed>"
+      },
+      "class_type": "Seed (rgthree)",
+      "_meta": {
+        "title": "Seed (1ST)"
+      }
+    },
+    "194": {
+      "inputs": {
+        "anything": [
+          "109:99",
+          0
+        ]
+      },
+      "class_type": "easy cleanGpuUsed",
+      "_meta": {
+        "title": "Clean VRAM Used"
+      }
+    },
+    "195": {
+      "inputs": {
+        "samples": [
+          "200",
+          1
+        ]
+      },
+      "class_type": "VAEDecode",
+      "_meta": {
+        "title": "VAE Decode"
+      }
+    },
+    "196": {
+      "inputs": {
+        "id": 0,
+        "widget_name": "scheduler",
+        "return_all": false,
+        "node_title": "",
+        "allowed_float_decimals": 2,
+        "any_input": [
+          "200",
+          2
+        ]
+      },
+      "class_type": "WidgetToString",
+      "_meta": {
+        "title": "Widget To String"
+      }
+    },
+    "197": {
+      "inputs": {
+        "id": 0,
+        "widget_name": "sampler_name",
+        "return_all": false,
+        "node_title": "",
+        "allowed_float_decimals": 2,
+        "any_input": [
+          "200",
+          2
+        ]
+      },
+      "class_type": "WidgetToString",
+      "_meta": {
+        "title": "Widget To String"
+      }
+    },
+    "198": {
+      "inputs": {
+        "value": 1
+      },
+      "class_type": "easy float",
+      "_meta": {
+        "title": "cfg"
+      }
+    },
+    "199": {
+      "inputs": {
+        "value": 8
+      },
+      "class_type": "easy int",
+      "_meta": {
+        "title": "steps"
+      }
+    },
+    "200": {
+      "inputs": {
+        "eta": 0,
+        "sampler_name": "linear/euler",
+        "scheduler": "simple",
+        "steps": [
+          "199",
+          0
+        ],
+        "steps_to_run": -1,
+        "denoise": [
+          "201",
+          0
+        ],
+        "cfg": [
+          "198",
+          0
+        ],
+        "seed": [
+          "187",
+          0
+        ],
+        "sampler_mode": "standard",
+        "bongmath": true,
+        "model": [
+          "21",
+          0
+        ],
+        "positive": [
+          "203",
+          0
+        ],
+        "negative": [
+          "202",
+          0
+        ],
+        "latent_image": [
+          "11",
+          0
+        ]
+      },
+      "class_type": "ClownsharKSampler_Beta",
+      "_meta": {
+        "title": "ClownsharKSampler"
+      }
+    },
+    "201": {
+      "inputs": {
+        "value": 1
+      },
+      "class_type": "easy float",
+      "_meta": {
+        "title": "denoise"
+      }
+    },
+    "202": {
+      "inputs": {
+        "conditioning": [
+          "203",
+          0
+        ]
+      },
+      "class_type": "ConditioningZeroOut",
+      "_meta": {
+        "title": "Conditioning Zero Out"
+      }
+    },
+    "203": {
+      "inputs": {
+        "text": [
+          "56:54",
+          0
+        ]
+      },
+      "class_type": "CLIPTextEncode",
+      "_meta": {
+        "title": "CLIP Text Encode (Prompt)"
+      }
+    },
+    "156:132": {
+      "inputs": {
+        "string": [
+          "156:131",
+          0
+        ],
+        "regex_pattern": "<lora:[^>]+>",
+        "mode": "All Matches",
+        "case_insensitive": true,
+        "multiline": false,
+        "dotall": false,
+        "group_index": 1
+      },
+      "class_type": "RegexExtract",
+      "_meta": {
+        "title": "Extract Text"
+      }
+    },
+    "156:135": {
+      "inputs": {
+        "delimiter": "",
+        "string1": [
+          "156:152",
+          0
+        ],
+        "string2": [
+          "156:153",
+          0
+        ]
+      },
+      "class_type": "JoinStrings",
+      "_meta": {
+        "title": "Join Strings"
+      }
+    },
+    "156:139": {
+      "inputs": {
+        "text": "",
+        "anything": [
+          "156:132",
+          0
+        ]
+      },
+      "class_type": "easy showAnything",
+      "_meta": {
+        "title": "Show Any"
+      }
+    },
+    "156:143": {
+      "inputs": {
+        "text": "1.0",
+        "anything": [
+          "198",
+          0
+        ]
+      },
+      "class_type": "easy showAnything",
+      "_meta": {
+        "title": "CFG"
+      }
+    },
+    "156:141": {
+      "inputs": {
+        "text": "redcraft23INT8INT4FP8_30Krea2.safetensors",
+        "anything": [
+          "144",
+          0
+        ]
+      },
+      "class_type": "easy showAnything",
+      "_meta": {
+        "title": "Difussion model"
+      }
+    },
+    "156:145": {
+      "inputs": {
+        "text": "linear/euler",
+        "anything": [
+          "197",
+          0
+        ]
+      },
+      "class_type": "easy showAnything",
+      "_meta": {
+        "title": "Sampler"
+      }
+    },
+    "156:147": {
+      "inputs": {
+        "text": "simple",
+        "anything": [
+          "196",
+          0
+        ]
+      },
+      "class_type": "easy showAnything",
+      "_meta": {
+        "title": "Scheduler"
+      }
+    },
+    "156:150": {
+      "inputs": {
+        "text": "1.0",
+        "anything": [
+          "201",
+          0
+        ]
+      },
+      "class_type": "easy showAnything",
+      "_meta": {
+        "title": "Denoise"
+      }
+    },
+    "156:155": {
+      "inputs": {
+        "filename": "<per_job:output_filename>",
+        "path": "<per_job:output_path>",
+        "extension": "png",
+        "steps": [
+          "199",
+          0
+        ],
+        "cfg": [
+          "156:143",
+          0
+        ],
+        "modelname": [
+          "156:141",
+          0
+        ],
+        "sampler_name": [
+          "156:145",
+          0
+        ],
+        "scheduler_name": [
+          "156:147",
+          0
+        ],
+        "positive": [
+          "156:133",
+          0
+        ],
+        "negative": "",
+        "seed_value": [
+          "128",
+          3
+        ],
+        "width": [
+          "156:186",
+          0
+        ],
+        "height": [
+          "156:186",
+          1
+        ],
+        "lossless_webp": true,
+        "quality_jpeg_or_webp": 100,
+        "optimize_png": false,
+        "counter": 0,
+        "denoise": [
+          "156:150",
+          0
+        ],
+        "clip_skip": 0,
+        "time_format": "%Y-%m-%d-%H%M%S",
+        "save_workflow_as_json": false,
+        "embed_workflow": true,
+        "additional_hashes": [
+          "156:153",
+          0
+        ],
+        "download_civitai_data": true,
+        "easy_remix": true,
+        "show_preview": true,
+        "custom": "",
+        "images": [
+          "96",
+          0
+        ]
+      },
+      "class_type": "Image Saver",
+      "_meta": {
+        "title": "Image Saver"
+      }
+    },
+    "156:133": {
+      "inputs": {
+        "delimiter": " ",
+        "string1": [
+          "56:54",
+          0
+        ],
+        "string2": [
+          "156:139",
+          0
+        ]
+      },
+      "class_type": "JoinStrings",
+      "_meta": {
+        "title": "Join Strings"
+      }
+    },
+    "156:186": {
+      "inputs": {
+        "image": [
+          "96",
+          0
+        ]
+      },
+      "class_type": "GetImageSize",
+      "_meta": {
+        "title": "Get Image Size"
+      }
+    },
+    "156:153": {
+      "inputs": {
+        "username": "latentheart",
+        "model_name": "Krea2 [SFW / NSFW] Uncensored - Image-to-Prompt + Prompt Enhancer + 4K Upscaler + CivitAI Metadata",
+        "version": ""
+      },
+      "class_type": "Civitai Hash Fetcher (Image Saver)",
+      "_meta": {
+        "title": "Civitai Hash Fetcher (Image Saver)"
+      }
+    },
+    "156:131": {
+      "inputs": {
+        "string": [
+          "138",
+          0
+        ],
+        "regex_pattern": "lora_\\d+: \\{'on': True, 'lora': '([^']+?)\\.safetensors', 'strength': (\\d*\\.?\\d+)\\}",
+        "replace": "<lora:\\1:\\2>",
+        "case_insensitive": true,
+        "multiline": false,
+        "dotall": false,
+        "count": 0
+      },
+      "class_type": "RegexReplace",
+      "_meta": {
+        "title": "Replace Text (Regex)"
+      }
+    },
+    "156:152": {
+      "inputs": {
+        "value": "Workflow:"
+      },
+      "class_type": "PrimitiveString",
+      "_meta": {
+        "title": "Text"
+      }
+    },
+    "109:97": {
+      "inputs": {
+        "value": "ceil(a*8)",
+        "a": [
+          "109:98",
+          0
+        ]
+      },
+      "class_type": "easy simpleMath",
+      "_meta": {
+        "title": "Simple Math"
+      }
+    },
+    "109:99": {
+      "inputs": {
+        "samples": [
+          "109:100",
+          1
+        ]
+      },
+      "class_type": "VAEDecode",
+      "_meta": {
+        "title": "VAE Decode"
+      }
+    },
+    "109:98": {
+      "inputs": {
+        "value": 0.2
+      },
+      "class_type": "easy float",
+      "_meta": {
+        "title": "DENOISE"
+      }
+    },
+    "109:100": {
+      "inputs": {
+        "eta": 0.9,
+        "sampler_name": "exponential/res_2s",
+        "scheduler": "bong_tangent",
+        "steps": 8,
+        "steps_to_run": [
+          "109:97",
+          0
+        ],
+        "denoise": [
+          "109:98",
+          0
+        ],
+        "cfg": 1,
+        "seed": [
+          "187",
+          0
+        ],
+        "sampler_mode": "standard",
+        "bongmath": true,
+        "model": [
+          "21",
+          0
+        ],
+        "positive": [
+          "203",
+          0
+        ],
+        "negative": [
+          "202",
+          0
+        ],
+        "latent_image": [
+          "200",
+          0
+        ]
+      },
+      "class_type": "ClownsharKSampler_Beta",
+      "_meta": {
+        "title": "ClownsharKSampler"
+      }
+    },
+    "56:48": {
+      "inputs": {},
+      "class_type": "ImpactIfNone",
+      "_meta": {
+        "title": "ImpactIfNone"
+      }
+    },
+    "56:49": {
+      "inputs": {},
+      "class_type": "ImpactIfNone",
+      "_meta": {
+        "title": "ImpactIfNone"
+      }
+    },
+    "56:50": {
+      "inputs": {
+        "values.value0": [
+          "56:49",
+          1
+        ],
+        "values.value1": [
+          "56:48",
+          1
+        ]
+      },
+      "class_type": "ComfyOrNode",
+      "_meta": {
+        "title": "Or"
+      }
+    },
+    "56:54": {
+      "inputs": {
+        "switch": [
+          "56:50",
+          0
+        ],
+        "on_false": [
+          "46",
+          0
+        ],
+        "on_true": [
+          "56:55",
+          0
+        ]
+      },
+      "class_type": "ComfySwitchNode",
+      "_meta": {
+        "title": "If/Else Switch"
+      }
+    },
+    "56:55": {
+      "inputs": {
+        "prompt": [
+          "56:52",
+          0
+        ],
+        "max_length": 512,
+        "sampling_mode": "on",
+        "sampling_mode.temperature": 0.7,
+        "sampling_mode.top_k": 64,
+        "sampling_mode.top_p": 0.95,
+        "sampling_mode.min_p": 0.05,
+        "sampling_mode.repetition_penalty": 1.05,
+        "sampling_mode.seed": [
+          "56:53",
+          0
+        ],
+        "sampling_mode.presence_penalty": 0,
+        "thinking": true,
+        "use_default_template": false,
+        "mtp": "auto"
+      },
+      "class_type": "TextGenerate",
+      "_meta": {
+        "title": "Generate Text"
+      }
+    },
+    "56:53": {
+      "inputs": {
+        "seed": 67157368864700
+      },
+      "class_type": "Seed (rgthree)",
+      "_meta": {
+        "title": "Seed (rgthree)"
+      }
+    },
+    "56:51": {
+      "inputs": {
+        "value": "You are an image prompt engineer. Your task is to produce a single, optimized image generation prompt.\n\nYou may receive:\n- An image (analyze its style, composition, subject, lighting, and mood)\n- A base prompt from the user (use it as the creative direction)\n- Both (blend the visual analysis with the user's intent)\n- Neither (generate a vivid, creative prompt on your own)\n\n\nRules:\n- Do NOT describe the image conversationally.\n- Output ONLY a prompt suitable for an image generation model.\n- Avoid extra sentences like \"Here is...\"\n- Include NSFW descriptins if aplicable.\n\nPrompt requirements:\n1. Subject description:\n   - Identify and explicitly state the ethnicity and age immediately\n   - Body proportions (highly important)\n   - Facial features, skin texture, expression, gaze direction.\n   - Hair style, hair color, accessories, jewlery, etc.\n   - Clothing, materials, fit, layers\n\n2. Pose and composition:\n   - Body pose, hand position, posture.\n   - Framing (close-up, medium shot, full body)\n   - Camera angle (eye level, front view, back view, low angle, top-down, etc)\n   - Subject placement in frame\n   - Character Dynamics: If characters are present in the image or text, explicitly describe their physical actions, spatial relationship, and interactions with one another. Describe any sexual intercourse if any.\n\n3. Environment and background:\n   - Location type (studio, indoor, outdoor)\n   - Background color, texture, objects\n   - Depth of field\n\n4. Lighting:\n   - Light direction, softness, contrast\n   - Time of day or artificial lighting style\n\n5. Artistic and technical style:\n   - Photorealistic, cinematic, illustration, anime, 3D render, etc.\n   - Lens look (wide, portrait compression), bokeh if visible\n   - Image sharpness, noise, realism level\n\n6. Color and mood:\n   - Dominant colors\n   - Color grading (warm, cool, neutral, muted, vibrant)\n\nFormatting rules:\n- Output as a single, highly descriptive paragraph of natural, dense prose.\n- Use concrete, reproducible descriptors.\n\nBase prompt:"
+      },
+      "class_type": "PrimitiveStringMultiline",
+      "_meta": {
+        "title": "System prompt"
+      }
+    },
+    "56:52": {
+      "inputs": {
+        "delimiter": " ",
+        "string1": [
+          "56:51",
+          0
+        ],
+        "string2": [
+          "46",
+          0
+        ]
+      },
+      "class_type": "JoinStrings",
+      "_meta": {
+        "title": "Join Strings"
+      }
+    }
+  },
+  "restripped_from": "pipeline/comfy/snapshots/H3regensElements/20261009_as_saved_e8fa52ebc974.api.json"
+}

@@ -1,7 +1,7 @@
 {
   "template": "H3regensElements",
   "ui_sha256": "9def8cf4dcf1ad022c6165c136d290b9082bcd9180703c7574aa25d2232d70c8",
-  "config_hash": "e8fa52ebc974116bef2d2f2f8bb1d75ef838686822317371183040eac814d879",
+  "config_hash": "f743a80a1f3c5f51a7c65f9705682bb79f1559c8998ff4e3c90693cf696b0bd4",
   "created": "2026-10-09T23:40:02+02:00",
   "note": "Every value as the user saved it; per-job values are placeholders. Run requests show changes as a diff against this file.",
   "ui_modes": {
@@ -172,8 +172,8 @@
       "inputs": {
         "mode": "Manual",
         "latent_type": "latent_4x8",
-        "width": 1920,
-        "height": 1080,
+        "width": "<per_job:width>",
+        "height": "<per_job:height>",
         "auto_detect": false,
         "rescale_mode": "resolution",
         "rescale_value": 1,

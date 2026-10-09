@@ -91,7 +91,7 @@ These three become the first entries in the manifest library. They are not defau
 *Found in step 6:*
 - **ComfyUI blocks extension-started navigations.** Its server answers 403 to any request marked `Sec-Fetch-Site: cross-site` (`server.py:162`), which Chrome sets when the extension opens a URL. So the user opens the studio tab once by typing the address. The tab's own `location.reload()` works afterwards. The restart path for unattended windows is designed in step 7, without weakening that protection.
 - **The extension forgets its tab group when it reconnects.** It then needs the studio tab opened again.
-- **Krea template:** node 13 is saved at 1920×1080, and the manifest forces 2560×1440 as `h3-gacha-pipeline` §7 records. Also, `56:54.switch` is saved wired to `56:50`, and the skill's patch forces it to `false`.
+- **Krea template:** node 13 is saved at 1920×1080. The user decided (2026-10-09) on 2560×1440 for character sheets and 1920×1080 for everything else, so width and height are per-job values. Also, `56:54.switch` is saved wired to `56:50`, and the skill's patch forces it to `false`.
 - **Node labels:** ComfyUI reports several packs' nodes as `comfyui-workflow-encrypt`, because that extension re-exports the global node list. It is a labeling quirk; the environment pin goes by folder.
 
 Plus `bridge/comfy_api.py` (status, queue, history, free, outputs, logs; no submit until step 8's check exists), `bridge/page_recipes.js` and `skills/comfy-bridge/SKILL.md`. Nothing is queued.

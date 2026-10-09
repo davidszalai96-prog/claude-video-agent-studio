@@ -58,7 +58,7 @@ Manifests done on 2026-10-09:
 - `H3regenrunsTest`: saved as `sage`; 25 API nodes.
 - `H3ultRefsTest2`: saved as `chunked`; 3 references.
 - `H3regensElements`: Krea, with the §7 patches from `h3-gacha-pipeline`.
-  - Node 13 is saved at 1920×1080; the manifest forces 2560×1440 as the skill records.
+  - Node 13's width and height are per-job values: 2560×1440 for character sheets, 1920×1080 as saved for everything else (user decision 2026-10-09).
   - `56:54.switch` is saved wired to `56:50`, and the skill's patch forces it to `false`.
 
 ## Converting a job (Render Wrangler)

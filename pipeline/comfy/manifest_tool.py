@@ -6,6 +6,7 @@
     ... manifest_tool.py modes <id> <sol|chunked|sage>      # node modes to apply in the page before conversion
     ... manifest_tool.py ingest <id> <page_output.json>     # snapshot + default profile from a studio-tab conversion
     ... manifest_tool.py check <id>                         # manifest vs saved file, snapshot and profile
+    ... manifest_tool.py restrip <id>                       # after adding per_job entries, without a new conversion
 
 Reads the user's workflow files; never writes them. Writes only under pipeline/comfy/.
 """
@@ -329,6 +330,35 @@ def cmd_ingest(a):
     return 1 if problems else 0
 
 
+def cmd_restrip(a):
+    """Re-apply per-job placeholders to the latest as-saved snapshot after per_job grew (no page needed).
+
+    Only adds placeholders: a value already replaced by a placeholder cannot be restored without a new conversion.
+    """
+    m = load_manifest(a.id)
+    if not m.get("snapshot"):
+        raise SystemExit("no as-saved snapshot yet; convert in the studio tab and ingest first")
+    old = json.loads((lib.REPO / m["snapshot"]).read_text("utf-8"))
+    stripped, problems = strip_per_job(old["api_prompt"], m)
+    if problems:
+        raise SystemExit("\n".join(problems))
+    h = config_hash(stripped)
+    snap = SNAPSHOTS / m["id"] / f"{datetime.now().strftime('%Y%m%d')}_as_saved_{h[:12]}.api.json"
+    save(snap, {**old, "config_hash": h, "api_prompt": stripped, "restripped_from": m["snapshot"]})
+    prof_path = lib.REPO / m["default_profile"]
+    prof = json.loads(prof_path.read_text("utf-8"))
+    prof.update({"config_hash": h, "values": {nid: {"class": n.get("class_type"),
+                 "inputs": {k: v for k, v in n.get("inputs", {}).items() if not isinstance(v, list)}}
+                 for nid, n in stripped.items()}})
+    save(prof_path, prof)
+    m.update({"snapshot": rel(snap), "updated": lib.now_iso()})
+    att = m.get("attention") or {}
+    if att.get("saved_profile") in att.get("profiles", {}):
+        att["profiles"][att["saved_profile"]]["verified"] = rel(snap)
+    save(MANIFESTS / f"{m['id']}.json", m)
+    print(f"wrote {rel(snap)} (config hash {h[:12]}) and updated {rel(prof_path)}")
+
+
 def cmd_check(a):
     m = load_manifest(a.id)
     results = [("manifest schema", not lib.schema_errors("manifest", m), "; ".join(lib.schema_errors("manifest", m)[:3]))]
@@ -374,9 +404,10 @@ def main(argv=None) -> int:
     g.add_argument("id")
     g.add_argument("page_output")
     sub.add_parser("check").add_argument("id")
+    sub.add_parser("restrip", help="re-apply per-job placeholders after per_job grew").add_argument("id")
     a = ap.parse_args(argv)
     return {"list": cmd_list, "inspect": cmd_inspect, "init": cmd_init, "modes": cmd_modes,
-            "ingest": cmd_ingest, "check": cmd_check}[a.cmd](a) or 0
+            "ingest": cmd_ingest, "check": cmd_check, "restrip": cmd_restrip}[a.cmd](a) or 0
 
 
 if __name__ == "__main__":

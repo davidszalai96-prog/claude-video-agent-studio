@@ -6,7 +6,7 @@
   "ui_sha256": "9def8cf4dcf1ad022c6165c136d290b9082bcd9180703c7574aa25d2232d70c8",
   "status": "checked",
   "comfy_version": "0.37.0",
-  "updated": "2026-10-09T23:40:02+02:00",
+  "updated": "2026-10-09T23:50:25+02:00",
   "per_job": {
     "prompt": {
       "targets": [
@@ -48,6 +48,26 @@
         }
       ],
       "type": "save_filename"
+    },
+    "width": {
+      "targets": [
+        {
+          "node": "13",
+          "input": "width"
+        }
+      ],
+      "type": "int",
+      "note": "2560x1440 for character sheets (CHAR_ assets: the user asked for 1440p after a 1080p standee came out with mismatched eyes); 1920x1080 as saved for everything else (user decision 2026-10-09)"
+    },
+    "height": {
+      "targets": [
+        {
+          "node": "13",
+          "input": "height"
+        }
+      ],
+      "type": "int",
+      "note": "2560x1440 for character sheets (CHAR_ assets: the user asked for 1440p after a 1080p standee came out with mismatched eyes); 1920x1080 as saved for everything else (user decision 2026-10-09)"
     }
   },
   "outputs": [
@@ -74,20 +94,6 @@
         0
       ],
       "source": "h3-gacha-pipeline §7: force the raw prompt (switch false); as saved, the switch is wired to 56:50, which the enhancer logic drives"
-    },
-    {
-      "node": "13",
-      "input": "width",
-      "value": 2560,
-      "saved_value": 1920,
-      "source": "h3-gacha-pipeline §7: the user asked for 1440p after a 1080p standee came out with mismatched eyes"
-    },
-    {
-      "node": "13",
-      "input": "height",
-      "value": 1440,
-      "saved_value": 1080,
-      "source": "h3-gacha-pipeline §7: as above"
     }
   ],
   "wiring": [
@@ -136,11 +142,11 @@
         38
       ],
       "peak_vram_gb": null,
-      "source": "h3-gacha-pipeline §7 at 1080p; re-measure at 2560x1440"
+      "source": "h3-gacha-pipeline §7, measured at 1080p; re-measure character sheets at 2560x1440"
     }
   },
   "default_profile": "pipeline/comfy/profiles/H3regensElements.default.json",
-  "snapshot": "pipeline/comfy/snapshots/H3regensElements/20261009_as_saved_e8fa52ebc974.api.json",
+  "snapshot": "pipeline/comfy/snapshots/H3regensElements/20261009_as_saved_f743a80a1f3c.api.json",
   "frontend_version": "1.53.6",
   "required_classes": [
     "Any Switch (rgthree)",

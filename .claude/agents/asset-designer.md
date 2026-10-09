@@ -30,7 +30,8 @@ Krea renders land in the project's footage folder under `stills/<ID>/`, and the 
    - sheet type: character turnaround and expressions, cutout props, effects at their peak frame, or environment plate;
    - grid layout.
 2. Write the Krea prompt from the proven pattern (`h3-gacha-pipeline` §7):
-   - a wordless, unlabeled grid on a plain background with generous spacing, at 2560×1440;
+   - a wordless, unlabeled grid on a plain background with generous spacing;
+   - 2560×1440 for character sheets, 1920×1080 for everything else (set `width` and `height` in the job spec);
    - light or mid grey background for cutouts, black for effects.
 3. Request a seed sweep of three or four seeds per sheet, as one job spec per candidate in `05_prompts/jobs/<ASSET>_c##.json` (schema `job_spec`, kind `krea`).
 4. Check each result: faces and eyes, every item present, items separated, style match, each effect distinct in silhouette. Reject failures and request a new seed. The project's approval policy sets how many retakes a still gets and how the user chooses between candidates.

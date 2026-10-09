@@ -36,7 +36,7 @@
   },
   "krea": {
     "seconds_per_image": { "value": [35, 38], "status": "measured at 1080p; re-measure at 2560x1440", "source": "h3-gacha-pipeline §7" },
-    "resolution": [2560, 1440],
+    "resolution": { "character_sheets": [2560, 1440], "other": [1920, 1080], "source": "user decision 2026-10-09" },
     "seeds_per_sheet": [3, 4],
     "seeds_per_keyframe": 2
   },
