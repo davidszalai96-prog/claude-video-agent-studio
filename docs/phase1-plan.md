@@ -166,7 +166,20 @@ Points for you:
   - a new default.
 - For a workflow that has no manifest yet, the Pipeline TD first writes one from your saved file. It is marked unmeasured until a smoke test in an approved window measures it.
 - The Producer's intake asks which workflows a project should use, and offers the defaults.
-- Standing rule 1 in h3-gacha-pipeline (no sol-attn for high-motion work) stays as written until you change it. The sparse/pruned setup (Solenne_v5, Xiaoyu_v3) is available on request like any other workflow.
+- The sparse/pruned setup (Solenne_v5, Xiaoyu_v3, with the pruned int8 model at 1.4 MP) is available on request like any other workflow.
+
+**H2. Attention profile for H3 (decided 2026-10-09).** sol-attn (BlockSparseAttention) is the default for every H3 job, for speed. It applies to H3 video generation only, never to Krea. This replaces standing rule 1 in h3-gacha-pipeline ("no sol-attn for high-motion work"); step 3 updates the skill.
+- All H3 workflows share one model chain with the same node IDs: 127 UNET → 152 preview → 187 kitchen attention → 159 Sage KJ → 158 chunked feed-forward → 155 LowVRAM attention → 153 memory-efficient Sage → 154 LoRA → 190 BlockSparseAttention → 193 → sampler. A profile is a set of node modes there:
+
+| Profile | On | Bypassed | Matches |
+| --- | --- | --- | --- |
+| `sol` (default) | 187, 190 | 153, 155, 158, 159 | H3ultSingleRefSparse as you saved it |
+| `chunked` (fallback) | 187, 155, 158 | 153, 159, 190 | H3ultRefsTest2 as you saved it |
+| `sage` (as saved in H3regenrunsTest) | 159, 153 | 155, 158, 187, 190 | H3regenrunsTest as you saved it |
+
+- The profile is applied in the studio's ComfyUI tab before graphToPrompt. Your saved workflow files are never changed.
+- **Fallback:** when you report low quality, or VRAM fills (a watchdog halt, or a peak at the limit), the studio switches that project's H3 jobs to `chunked` without a new approval. It records the switch as a decision and reports it.
+- `sol` has no measured time or VRAM peak yet. Until the first smoke test measures it, budgets use the measured non-sol numbers (22–33 min per unit) as the upper bound.
 
 **I. ComfyUI launcher.** It is `C:\Users\david\Desktop\ComfyUI.bat`: vcvars64, then `C:\CUVenv`, then `python main.py --cuda-device 0 --disable-pinned-memory --disable-comfy-compiler`. Other launchers sit next to it (ComfyUINSFW.bat, "ComfyUI - LTX2.bat" and others), and a restart always reopens with ComfyUI.bat.
 *Proposal:* at the start of a window the watchdog compares the running ComfyUI's command line with ComfyUI.bat's and warns you if they differ. "Close ComfyUI" means the python.exe listening on 8188 plus its parent cmd.exe console, and nothing else.
