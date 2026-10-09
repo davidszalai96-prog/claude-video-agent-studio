@@ -1,0 +1,217 @@
+{
+  "id": "H3ultRefsTest2",
+  "template": "H3ultRefsTest2",
+  "kind": "h3",
+  "file": "workflows/H3ultRefsTest2.json",
+  "ui_sha256": "5d22e2c64ddebdfd7499b3cd6f3d0bd1cc6c76270c25dd7bb2e47a5d968d90e4",
+  "status": "checked",
+  "comfy_version": "0.37.0",
+  "updated": "2026-10-09T23:40:18+02:00",
+  "per_job": {
+    "prompt": {
+      "targets": [
+        {
+          "node": "138",
+          "input": "value"
+        }
+      ],
+      "type": "text"
+    },
+    "ref_image_0": {
+      "targets": [
+        {
+          "node": "195",
+          "input": "image"
+        }
+      ],
+      "type": "image"
+    },
+    "ref_image_1": {
+      "targets": [
+        {
+          "node": "235",
+          "input": "image"
+        }
+      ],
+      "type": "image"
+    },
+    "ref_image_2": {
+      "targets": [
+        {
+          "node": "236",
+          "input": "image"
+        }
+      ],
+      "type": "image"
+    },
+    "seed": {
+      "targets": [
+        {
+          "node": "129",
+          "input": "noise_seed"
+        }
+      ],
+      "type": "int"
+    },
+    "duration_s": {
+      "targets": [
+        {
+          "node": "132",
+          "input": "value"
+        }
+      ],
+      "type": "float"
+    },
+    "megapixels": {
+      "targets": [
+        {
+          "node": "192",
+          "input": "Number"
+        }
+      ],
+      "type": "float_string"
+    },
+    "output_prefix": {
+      "targets": [
+        {
+          "node": "92",
+          "input": "filename_prefix"
+        }
+      ],
+      "type": "save_prefix"
+    }
+  },
+  "outputs": [
+    {
+      "node": "92",
+      "class": "SaveVideo",
+      "kind": "video"
+    }
+  ],
+  "rules": [
+    "one GPU job at a time",
+    "never use video references",
+    "change only per_job values; forced and wiring entries name their source",
+    "legacy decode as saved",
+    "free memory after each job",
+    "attention profile sol by default, chunked as fallback"
+  ],
+  "attention": {
+    "chain": [
+      "127",
+      "152",
+      "187",
+      "159",
+      "158",
+      "155",
+      "153",
+      "154",
+      "190",
+      "193"
+    ],
+    "nodes": {
+      "kitchen": {
+        "node": "187",
+        "class": "ModelAttentionBackend"
+      },
+      "sage_kj": {
+        "node": "159",
+        "class": "PathchSageAttentionKJ"
+      },
+      "chunk_ff": {
+        "node": "158",
+        "class": "MiniMaxChunkFeedForward"
+      },
+      "low_vram": {
+        "node": "155",
+        "class": "MiniMaxLowVRAMAttention"
+      },
+      "mem_eff_sage": {
+        "node": "153",
+        "class": "MiniMaxH3MemoryEfficientSageAttentionPatch"
+      },
+      "sol": {
+        "node": "190",
+        "class": "BlockSparseAttention"
+      }
+    },
+    "profiles": {
+      "sol": {
+        "modes": {
+          "187": 0,
+          "159": 4,
+          "158": 4,
+          "155": 4,
+          "153": 4,
+          "190": 0
+        },
+        "verified": "pipeline/comfy/snapshots/H3ultRefsTest2/20261009_sol_48fc091da313.api.json"
+      },
+      "chunked": {
+        "modes": {
+          "187": 0,
+          "159": 4,
+          "158": 0,
+          "155": 0,
+          "153": 4,
+          "190": 4
+        },
+        "verified": "pipeline/comfy/snapshots/H3ultRefsTest2/20261009_as_saved_081e25a0fbc8.api.json"
+      },
+      "sage": {
+        "modes": {
+          "187": 4,
+          "159": 0,
+          "158": 4,
+          "155": 4,
+          "153": 0,
+          "190": 4
+        },
+        "verified": "pipeline/comfy/snapshots/H3ultRefsTest2/20261009_sage_ad88aa362bda.api.json"
+      }
+    },
+    "saved_profile": "chunked"
+  },
+  "preview_node": "152",
+  "measured": {
+    "sol": {
+      "status": "unmeasured"
+    },
+    "chunked": {
+      "status": "unmeasured"
+    },
+    "sage": {
+      "status": "unmeasured"
+    }
+  },
+  "default_profile": "pipeline/comfy/profiles/H3ultRefsTest2.default.json",
+  "snapshot": "pipeline/comfy/snapshots/H3ultRefsTest2/20261009_as_saved_081e25a0fbc8.api.json",
+  "frontend_version": "1.53.6",
+  "required_classes": [
+    "BasicGuider",
+    "BasicScheduler",
+    "CLIPLoader",
+    "ComfyMathExpression",
+    "CreateVideo",
+    "Float",
+    "H3VAEDecodeBlend",
+    "KSamplerSelect",
+    "LoadImage",
+    "MiniMaxChunkFeedForward",
+    "MiniMaxH3ReferenceToVideo",
+    "MiniMaxLowVRAMAttention",
+    "ModelAttentionBackend",
+    "ModelPreviewOverrideKJ",
+    "PrimitiveFloat",
+    "PrimitiveStringMultiline",
+    "RandomNoise",
+    "ResolutionSelector",
+    "SamplerCustomAdvanced",
+    "SaveVideo",
+    "UNETLoader",
+    "VAEDecodeAudio",
+    "VAELoader",
+    "VRAM_Debug",
+    "easy cleanGpuUsed"
+  ]
+}

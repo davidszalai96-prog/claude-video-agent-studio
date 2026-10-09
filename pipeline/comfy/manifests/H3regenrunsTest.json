@@ -1,0 +1,198 @@
+{
+  "id": "H3regenrunsTest",
+  "template": "H3regenrunsTest",
+  "kind": "h3",
+  "file": "workflows/H3regenrunsTest.json",
+  "ui_sha256": "2dd436c7dc8fdc85dc27c7bc4df6d643c72b6addd372694e7838457ed100485c",
+  "status": "checked",
+  "comfy_version": "0.37.0",
+  "updated": "2026-10-09T23:40:17+02:00",
+  "per_job": {
+    "prompt": {
+      "targets": [
+        {
+          "node": "138",
+          "input": "value"
+        }
+      ],
+      "type": "text"
+    },
+    "ref_image_0": {
+      "targets": [
+        {
+          "node": "195",
+          "input": "image"
+        }
+      ],
+      "type": "image"
+    },
+    "seed": {
+      "targets": [
+        {
+          "node": "129",
+          "input": "noise_seed"
+        }
+      ],
+      "type": "int"
+    },
+    "duration_s": {
+      "targets": [
+        {
+          "node": "132",
+          "input": "value"
+        }
+      ],
+      "type": "float"
+    },
+    "megapixels": {
+      "targets": [
+        {
+          "node": "192",
+          "input": "Number"
+        }
+      ],
+      "type": "float_string"
+    },
+    "output_prefix": {
+      "targets": [
+        {
+          "node": "92",
+          "input": "filename_prefix"
+        }
+      ],
+      "type": "save_prefix"
+    }
+  },
+  "outputs": [
+    {
+      "node": "92",
+      "class": "SaveVideo",
+      "kind": "video"
+    }
+  ],
+  "rules": [
+    "one GPU job at a time",
+    "never use video references",
+    "change only per_job values; forced and wiring entries name their source",
+    "legacy decode as saved",
+    "free memory after each job",
+    "attention profile sol by default, chunked as fallback"
+  ],
+  "attention": {
+    "chain": [
+      "127",
+      "152",
+      "187",
+      "159",
+      "158",
+      "155",
+      "153",
+      "154",
+      "190",
+      "193"
+    ],
+    "nodes": {
+      "kitchen": {
+        "node": "187",
+        "class": "ModelAttentionBackend"
+      },
+      "sage_kj": {
+        "node": "159",
+        "class": "PathchSageAttentionKJ"
+      },
+      "chunk_ff": {
+        "node": "158",
+        "class": "MiniMaxChunkFeedForward"
+      },
+      "low_vram": {
+        "node": "155",
+        "class": "MiniMaxLowVRAMAttention"
+      },
+      "mem_eff_sage": {
+        "node": "153",
+        "class": "MiniMaxH3MemoryEfficientSageAttentionPatch"
+      },
+      "sol": {
+        "node": "190",
+        "class": "BlockSparseAttention"
+      }
+    },
+    "profiles": {
+      "sol": {
+        "modes": {
+          "187": 0,
+          "159": 4,
+          "158": 4,
+          "155": 4,
+          "153": 4,
+          "190": 0
+        },
+        "verified": "pipeline/comfy/snapshots/H3regenrunsTest/20261009_sol_3acc06314e86.api.json"
+      },
+      "chunked": {
+        "modes": {
+          "187": 0,
+          "159": 4,
+          "158": 0,
+          "155": 0,
+          "153": 4,
+          "190": 4
+        },
+        "verified": "pipeline/comfy/snapshots/H3regenrunsTest/20261009_chunked_ac618831d24d.api.json"
+      },
+      "sage": {
+        "modes": {
+          "187": 4,
+          "159": 0,
+          "158": 4,
+          "155": 4,
+          "153": 0,
+          "190": 4
+        },
+        "verified": "pipeline/comfy/snapshots/H3regenrunsTest/20261009_as_saved_64736b7305f2.api.json"
+      }
+    },
+    "saved_profile": "sage"
+  },
+  "preview_node": "152",
+  "measured": {
+    "sol": {
+      "status": "unmeasured"
+    },
+    "chunked": {
+      "status": "unmeasured"
+    },
+    "sage": {
+      "status": "unmeasured"
+    }
+  },
+  "default_profile": "pipeline/comfy/profiles/H3regenrunsTest.default.json",
+  "snapshot": "pipeline/comfy/snapshots/H3regenrunsTest/20261009_as_saved_64736b7305f2.api.json",
+  "frontend_version": "1.53.6",
+  "required_classes": [
+    "BasicGuider",
+    "BasicScheduler",
+    "CLIPLoader",
+    "ComfyMathExpression",
+    "CreateVideo",
+    "Float",
+    "H3VAEDecodeBlend",
+    "KSamplerSelect",
+    "LoadImage",
+    "MiniMaxH3MemoryEfficientSageAttentionPatch",
+    "MiniMaxH3ReferenceToVideo",
+    "ModelPreviewOverrideKJ",
+    "PathchSageAttentionKJ",
+    "PrimitiveFloat",
+    "PrimitiveStringMultiline",
+    "RandomNoise",
+    "ResolutionSelector",
+    "SamplerCustomAdvanced",
+    "SaveVideo",
+    "UNETLoader",
+    "VAEDecodeAudio",
+    "VAELoader",
+    "VRAM_Debug",
+    "easy cleanGpuUsed"
+  ]
+}

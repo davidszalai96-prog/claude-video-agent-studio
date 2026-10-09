@@ -1,0 +1,642 @@
+{
+  "template": "H3regensElements",
+  "ui_sha256": "9def8cf4dcf1ad022c6165c136d290b9082bcd9180703c7574aa25d2232d70c8",
+  "config_hash": "e8fa52ebc974116bef2d2f2f8bb1d75ef838686822317371183040eac814d879",
+  "created": "2026-10-09T23:40:02+02:00",
+  "note": "Every value as the user saved it; per-job values are placeholders. Run requests show changes as a diff against this file.",
+  "ui_modes": {
+    "1": 0,
+    "2": 0,
+    "3": 0,
+    "4": 4,
+    "5": 0,
+    "6": 0,
+    "7": 0,
+    "8": 0,
+    "9": 0,
+    "10": 0,
+    "11": 0,
+    "12": 0,
+    "13": 0,
+    "14": 0,
+    "15": 0,
+    "16": 0,
+    "17": 0,
+    "18": 0,
+    "19": 0,
+    "20": 0,
+    "21": 0,
+    "34": 4,
+    "35": 4,
+    "36": 4,
+    "37": 0,
+    "38": 4,
+    "41": 0,
+    "42": 4,
+    "43": 0,
+    "44": 4,
+    "45": 0,
+    "46": 0,
+    "47": 0,
+    "56": 0,
+    "57": 0,
+    "58": 0,
+    "59": 0,
+    "61": 0,
+    "62": 0,
+    "63": 0,
+    "64": 0,
+    "65": 0,
+    "66": 0,
+    "72": 0,
+    "73": 0,
+    "75": 0,
+    "76": 0,
+    "77": 0,
+    "79": 0,
+    "80": 0,
+    "82": 4,
+    "83": 0,
+    "84": 0,
+    "85": 0,
+    "88": 0,
+    "89": 0,
+    "90": 4,
+    "91": 4,
+    "92": 0,
+    "93": 0,
+    "95": 0,
+    "96": 0,
+    "109": 0,
+    "110": 4,
+    "112": 0,
+    "120": 0,
+    "122": 0,
+    "123": 0,
+    "124": 0,
+    "128": 0,
+    "130": 0,
+    "134": 0,
+    "137": 0,
+    "138": 0,
+    "140": 0,
+    "142": 0,
+    "144": 0,
+    "146": 0,
+    "148": 0,
+    "149": 0,
+    "151": 0,
+    "154": 0,
+    "156": 0,
+    "157": 0,
+    "159": 0,
+    "160": 0,
+    "161": 0,
+    "162": 0,
+    "163": 0,
+    "164": 0,
+    "165": 0,
+    "166": 0,
+    "167": 0,
+    "168": 0,
+    "169": 0,
+    "170": 0,
+    "171": 0,
+    "172": 0,
+    "174": 0,
+    "176": 0,
+    "180": 0,
+    "181": 0,
+    "182": 0,
+    "184": 0,
+    "185": 0,
+    "187": 0,
+    "192": 4,
+    "194": 0,
+    "195": 0,
+    "196": 0,
+    "197": 0,
+    "198": 0,
+    "199": 0,
+    "200": 0,
+    "201": 0,
+    "202": 0,
+    "203": 0
+  },
+  "values": {
+    "1": {
+      "class": "Anything Everywhere",
+      "inputs": {}
+    },
+    "2": {
+      "class": "UNETLoader",
+      "inputs": {
+        "unet_name": "krea2_turbo_fp8.safetensors",
+        "weight_dtype": "default"
+      }
+    },
+    "5": {
+      "class": "VAELoader",
+      "inputs": {
+        "vae_name": "qwen_image_vae.safetensors"
+      }
+    },
+    "6": {
+      "class": "CLIPLoader",
+      "inputs": {
+        "clip_name": "qwen3vl_4b_fp8_scaled.safetensors",
+        "type": "krea2",
+        "device": "default"
+      }
+    },
+    "7": {
+      "class": "Anything Everywhere",
+      "inputs": {}
+    },
+    "8": {
+      "class": "Any Switch (rgthree)",
+      "inputs": {}
+    },
+    "9": {
+      "class": "Any Switch (rgthree)",
+      "inputs": {}
+    },
+    "11": {
+      "class": "EmptyLatentImage",
+      "inputs": {
+        "batch_size": 1
+      }
+    },
+    "13": {
+      "class": "ResolutionMaster",
+      "inputs": {
+        "mode": "Manual",
+        "latent_type": "latent_4x8",
+        "width": 1920,
+        "height": 1080,
+        "auto_detect": false,
+        "rescale_mode": "resolution",
+        "rescale_value": 1,
+        "batch_size": 0
+      }
+    },
+    "21": {
+      "class": "Power Lora Loader (rgthree)",
+      "inputs": {
+        "PowerLoraLoaderHeaderWidget": {
+          "type": "PowerLoraLoaderHeaderWidget"
+        },
+        "lora_1": {
+          "on": false,
+          "lora": "Krea2\\krea2filterbypass3.safetensors",
+          "strength": 2
+        },
+        "lora_2": {
+          "on": false,
+          "lora": "Krea2\\KNPV3_1.safetensors",
+          "strength": 1
+        },
+        "lora_3": {
+          "on": false,
+          "lora": "Krea2\\T-L-800_000003200.safetensors",
+          "strength": 1
+        },
+        "lora_4": {
+          "on": false,
+          "lora": "Krea2\\realism_engine_krea2_v2.safetensors",
+          "strength": 0.6
+        },
+        "lora_5": {
+          "on": false,
+          "lora": "Krea2\\krea2-masterpieces-v51.safetensors",
+          "strength": 1
+        },
+        "lora_6": {
+          "on": false,
+          "lora": "Krea2\\size_krea2_loraholic.safetensors",
+          "strength": 4
+        },
+        "lora_7": {
+          "on": false,
+          "lora": "Krea2\\SBEve-800_000003000.safetensors",
+          "strength": 1
+        },
+        "lora_8": {
+          "on": false,
+          "lora": "Krea2\\krea2-fake-b.safetensors",
+          "strength": 1
+        },
+        "lora_9": {
+          "on": false,
+          "lora": "Krea2\\BSlider-KREA2.safetensors",
+          "strength": 1
+        },
+        "lora_10": {
+          "on": false,
+          "lora": "Krea2\\k2_nice_body.safetensors",
+          "strength": 0.8
+        },
+        "lora_11": {
+          "on": false,
+          "lora": "Krea2\\Flat_anime_Krea_@.safetensors",
+          "strength": 0.5
+        },
+        "lora_12": {
+          "on": false,
+          "lora": "Krea2\\BArtstyle-KREA2-V1-1.safetensors",
+          "strength": 1
+        },
+        "lora_13": {
+          "on": false,
+          "lora": "Krea2\\berserk_krea2.safetensors",
+          "strength": 0.3
+        },
+        "lora_14": {
+          "on": false,
+          "lora": "Krea2\\betabeet-k2-4_c1-st6000.safetensors",
+          "strength": 1
+        },
+        "lora_15": {
+          "on": false,
+          "lora": "Krea2\\AIIllustOjisan_Krea2_v01.safetensors",
+          "strength": 1
+        },
+        "lora_16": {
+          "on": false,
+          "lora": "Krea2\\MoriiMee_Krea_epoch_10.safetensors",
+          "strength": 0.4
+        },
+        "lora_17": {
+          "on": false,
+          "lora": "Krea2\\MysticX_KREA2_v2.safetensors",
+          "strength": 1
+        },
+        "lora_18": {
+          "on": false,
+          "lora": "Krea2\\granblue_1138_detail_l_black_bg_krea2_lora-000008.safetensors",
+          "strength": 0.7
+        },
+        "lora_19": {
+          "on": false,
+          "lora": "Krea2\\meion_krea2_style_v7.0_c1-st4000.safetensors",
+          "strength": 1
+        },
+        "lora_20": {
+          "on": false,
+          "lora": "Krea2\\onineko_k2_v1.safetensors",
+          "strength": 1
+        },
+        "lora_21": {
+          "on": false,
+          "lora": "Krea2\\Cutesexyrobutts Krea.safetensors",
+          "strength": 1
+        },
+        "lora_22": {
+          "on": false,
+          "lora": "Krea2\\Wuwa_OC_Cinematic.safetensors",
+          "strength": 1
+        },
+        "➕ Add Lora": ""
+      }
+    },
+    "45": {
+      "class": "PreviewAny",
+      "inputs": {}
+    },
+    "46": {
+      "class": "PrimitiveStringMultiline",
+      "inputs": {
+        "value": "<per_job:prompt>"
+      }
+    },
+    "63": {
+      "class": "easy globalSeed",
+      "inputs": {
+        "value": 1027023787557056,
+        "mode": true,
+        "action": "randomize",
+        "last_seed": 1019391168871819
+      }
+    },
+    "75": {
+      "class": "easy imageSize",
+      "inputs": {}
+    },
+    "92": {
+      "class": "Image Comparer (rgthree)",
+      "inputs": {
+        "rgthree_comparer": {
+          "images": [
+            {
+              "name": "A",
+              "selected": true,
+              "url": "/api/view?filename=rgthree.compare._temp_lfipm_00003_.png&type=temp&subfolder=&rand=0.7620196264705525"
+            },
+            {
+              "name": "B",
+              "selected": true,
+              "url": "/api/view?filename=rgthree.compare._temp_lfipm_00004_.png&type=temp&subfolder=&rand=0.44960259099346256"
+            }
+          ]
+        }
+      }
+    },
+    "96": {
+      "class": "Any Switch (rgthree)",
+      "inputs": {}
+    },
+    "128": {
+      "class": "Seed",
+      "inputs": {
+        "seed": "<per_job:seed>"
+      }
+    },
+    "134": {
+      "class": "easy showAnything",
+      "inputs": {
+        "text": "redcraft23INT8INT4FP8_30Krea2:f6088960c0,manual1:E25D42BE080B"
+      }
+    },
+    "138": {
+      "class": "WidgetToString",
+      "inputs": {
+        "id": 21,
+        "widget_name": "",
+        "return_all": true,
+        "node_title": "",
+        "allowed_float_decimals": 2
+      }
+    },
+    "144": {
+      "class": "Workflow Input Value (Image Saver)",
+      "inputs": {
+        "node_id": "2",
+        "input_name": "unet_name"
+      }
+    },
+    "149": {
+      "class": "easy showAnything",
+      "inputs": {
+        "text": "Full-body character concept art of a male anime technical specialist aged 26, an anthropomorphic interpretation of Claude. Arknights: Endfield-inspired science-fiction gacha character aesthetic: refined anime features, believable adult proportions, layered industrial clothing, precise cel shading blended with soft volumetric lighting, detailed fabric and matte hardware.\n\nHe has a lean build, thin round dark-metal glasses, half-lidded gray-green eyes, pronounced dark circles beneath his eyes, and a faint knowing smile. His youthful face looks sleep-deprived, quietly intelligent and approachable. Rounded shoulders, upper back curved forward, neck leaning slightly forward, relaxed knees: the habitual slouch of an overworked programmer.\n\nHis messy medium-short hair is muted terracotta orange, base color #D97757. Broad separated locks radiate irregularly outward from the crown, creating a recognizable soft sunburst silhouette inspired by the Claude logo. Unequal lengths, thick rounded blunt tips, fluffy strand texture, a few drooping locks over the forehead. The radial shape is formed entirely by natural-looking hair.\n\nHe wears an oversized charcoal technical field jacket with stone-gray panels and an asymmetric hem over a rumpled ivory button-up shirt and loosely knotted narrow black tie. Unevenly pushed-up sleeves, a clipped ID badge, tapered slate utility trousers and worn black utility sneakers. Restrained terracotta stitching accents.\n\nHis left upper arm holds one closed graphite laptop snugly against his ribs beneath his armpit, while his left hand supports its lower edge. His right hand holds one ivory takeaway coffee cup upright near his waist.\n\nA palm-sized terracotta robot companion sits securely on his right shoulder. Its silhouette resembles the blocky Claude Code mascot: a wide rectangular body, two vertical ivory rectangular eyes, one short rectangular arm projecting from each side, and four short rectangular legs arranged in two pairs. Simple crisp geometry, subtle physical depth, matte shell.\n\nSingle character, relaxed three-quarter view, entire body and feet visible, both props clearly readable. Vertical 2:3 composition, pale warm-gray studio background, soft neutral lighting, restrained colors, polished game character presentation, no lettering or watermark. "
+      }
+    },
+    "187": {
+      "class": "Seed (rgthree)",
+      "inputs": {
+        "seed": "<per_job:seed>"
+      }
+    },
+    "194": {
+      "class": "easy cleanGpuUsed",
+      "inputs": {}
+    },
+    "195": {
+      "class": "VAEDecode",
+      "inputs": {}
+    },
+    "196": {
+      "class": "WidgetToString",
+      "inputs": {
+        "id": 0,
+        "widget_name": "scheduler",
+        "return_all": false,
+        "node_title": "",
+        "allowed_float_decimals": 2
+      }
+    },
+    "197": {
+      "class": "WidgetToString",
+      "inputs": {
+        "id": 0,
+        "widget_name": "sampler_name",
+        "return_all": false,
+        "node_title": "",
+        "allowed_float_decimals": 2
+      }
+    },
+    "198": {
+      "class": "easy float",
+      "inputs": {
+        "value": 1
+      }
+    },
+    "199": {
+      "class": "easy int",
+      "inputs": {
+        "value": 8
+      }
+    },
+    "200": {
+      "class": "ClownsharKSampler_Beta",
+      "inputs": {
+        "eta": 0,
+        "sampler_name": "linear/euler",
+        "scheduler": "simple",
+        "steps_to_run": -1,
+        "sampler_mode": "standard",
+        "bongmath": true
+      }
+    },
+    "201": {
+      "class": "easy float",
+      "inputs": {
+        "value": 1
+      }
+    },
+    "202": {
+      "class": "ConditioningZeroOut",
+      "inputs": {}
+    },
+    "203": {
+      "class": "CLIPTextEncode",
+      "inputs": {}
+    },
+    "156:132": {
+      "class": "RegexExtract",
+      "inputs": {
+        "regex_pattern": "<lora:[^>]+>",
+        "mode": "All Matches",
+        "case_insensitive": true,
+        "multiline": false,
+        "dotall": false,
+        "group_index": 1
+      }
+    },
+    "156:135": {
+      "class": "JoinStrings",
+      "inputs": {
+        "delimiter": ""
+      }
+    },
+    "156:139": {
+      "class": "easy showAnything",
+      "inputs": {
+        "text": ""
+      }
+    },
+    "156:143": {
+      "class": "easy showAnything",
+      "inputs": {
+        "text": "1.0"
+      }
+    },
+    "156:141": {
+      "class": "easy showAnything",
+      "inputs": {
+        "text": "redcraft23INT8INT4FP8_30Krea2.safetensors"
+      }
+    },
+    "156:145": {
+      "class": "easy showAnything",
+      "inputs": {
+        "text": "linear/euler"
+      }
+    },
+    "156:147": {
+      "class": "easy showAnything",
+      "inputs": {
+        "text": "simple"
+      }
+    },
+    "156:150": {
+      "class": "easy showAnything",
+      "inputs": {
+        "text": "1.0"
+      }
+    },
+    "156:155": {
+      "class": "Image Saver",
+      "inputs": {
+        "filename": "<per_job:output_filename>",
+        "path": "<per_job:output_path>",
+        "extension": "png",
+        "negative": "",
+        "lossless_webp": true,
+        "quality_jpeg_or_webp": 100,
+        "optimize_png": false,
+        "counter": 0,
+        "clip_skip": 0,
+        "time_format": "%Y-%m-%d-%H%M%S",
+        "save_workflow_as_json": false,
+        "embed_workflow": true,
+        "download_civitai_data": true,
+        "easy_remix": true,
+        "show_preview": true,
+        "custom": ""
+      }
+    },
+    "156:133": {
+      "class": "JoinStrings",
+      "inputs": {
+        "delimiter": " "
+      }
+    },
+    "156:186": {
+      "class": "GetImageSize",
+      "inputs": {}
+    },
+    "156:153": {
+      "class": "Civitai Hash Fetcher (Image Saver)",
+      "inputs": {
+        "username": "latentheart",
+        "model_name": "Krea2 [SFW / NSFW] Uncensored - Image-to-Prompt + Prompt Enhancer + 4K Upscaler + CivitAI Metadata",
+        "version": ""
+      }
+    },
+    "156:131": {
+      "class": "RegexReplace",
+      "inputs": {
+        "regex_pattern": "lora_\\d+: \\{'on': True, 'lora': '([^']+?)\\.safetensors', 'strength': (\\d*\\.?\\d+)\\}",
+        "replace": "<lora:\\1:\\2>",
+        "case_insensitive": true,
+        "multiline": false,
+        "dotall": false,
+        "count": 0
+      }
+    },
+    "156:152": {
+      "class": "PrimitiveString",
+      "inputs": {
+        "value": "Workflow:"
+      }
+    },
+    "109:97": {
+      "class": "easy simpleMath",
+      "inputs": {
+        "value": "ceil(a*8)"
+      }
+    },
+    "109:99": {
+      "class": "VAEDecode",
+      "inputs": {}
+    },
+    "109:98": {
+      "class": "easy float",
+      "inputs": {
+        "value": 0.2
+      }
+    },
+    "109:100": {
+      "class": "ClownsharKSampler_Beta",
+      "inputs": {
+        "eta": 0.9,
+        "sampler_name": "exponential/res_2s",
+        "scheduler": "bong_tangent",
+        "steps": 8,
+        "cfg": 1,
+        "sampler_mode": "standard",
+        "bongmath": true
+      }
+    },
+    "56:48": {
+      "class": "ImpactIfNone",
+      "inputs": {}
+    },
+    "56:49": {
+      "class": "ImpactIfNone",
+      "inputs": {}
+    },
+    "56:50": {
+      "class": "ComfyOrNode",
+      "inputs": {}
+    },
+    "56:54": {
+      "class": "ComfySwitchNode",
+      "inputs": {}
+    },
+    "56:55": {
+      "class": "TextGenerate",
+      "inputs": {
+        "max_length": 512,
+        "sampling_mode": "on",
+        "sampling_mode.temperature": 0.7,
+        "sampling_mode.top_k": 64,
+        "sampling_mode.top_p": 0.95,
+        "sampling_mode.min_p": 0.05,
+        "sampling_mode.repetition_penalty": 1.05,
+        "sampling_mode.presence_penalty": 0,
+        "thinking": true,
+        "use_default_template": false,
+        "mtp": "auto"
+      }
+    },
+    "56:53": {
+      "class": "Seed (rgthree)",
+      "inputs": {
+        "seed": 67157368864700
+      }
+    },
+    "56:51": {
+      "class": "PrimitiveStringMultiline",
+      "inputs": {
+        "value": "You are an image prompt engineer. Your task is to produce a single, optimized image generation prompt.\n\nYou may receive:\n- An image (analyze its style, composition, subject, lighting, and mood)\n- A base prompt from the user (use it as the creative direction)\n- Both (blend the visual analysis with the user's intent)\n- Neither (generate a vivid, creative prompt on your own)\n\n\nRules:\n- Do NOT describe the image conversationally.\n- Output ONLY a prompt suitable for an image generation model.\n- Avoid extra sentences like \"Here is...\"\n- Include NSFW descriptins if aplicable.\n\nPrompt requirements:\n1. Subject description:\n   - Identify and explicitly state the ethnicity and age immediately\n   - Body proportions (highly important)\n   - Facial features, skin texture, expression, gaze direction.\n   - Hair style, hair color, accessories, jewlery, etc.\n   - Clothing, materials, fit, layers\n\n2. Pose and composition:\n   - Body pose, hand position, posture.\n   - Framing (close-up, medium shot, full body)\n   - Camera angle (eye level, front view, back view, low angle, top-down, etc)\n   - Subject placement in frame\n   - Character Dynamics: If characters are present in the image or text, explicitly describe their physical actions, spatial relationship, and interactions with one another. Describe any sexual intercourse if any.\n\n3. Environment and background:\n   - Location type (studio, indoor, outdoor)\n   - Background color, texture, objects\n   - Depth of field\n\n4. Lighting:\n   - Light direction, softness, contrast\n   - Time of day or artificial lighting style\n\n5. Artistic and technical style:\n   - Photorealistic, cinematic, illustration, anime, 3D render, etc.\n   - Lens look (wide, portrait compression), bokeh if visible\n   - Image sharpness, noise, realism level\n\n6. Color and mood:\n   - Dominant colors\n   - Color grading (warm, cool, neutral, muted, vibrant)\n\nFormatting rules:\n- Output as a single, highly descriptive paragraph of natural, dense prose.\n- Use concrete, reproducible descriptors.\n\nBase prompt:"
+      }
+    },
+    "56:52": {
+      "class": "JoinStrings",
+      "inputs": {
+        "delimiter": " "
+      }
+    }
+  }
+}

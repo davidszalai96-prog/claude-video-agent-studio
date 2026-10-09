@@ -1,0 +1,388 @@
+{
+  "template": "H3regenrunsTest",
+  "label": "sol",
+  "profile": {
+    "153": 4,
+    "155": 4,
+    "158": 4,
+    "159": 4,
+    "187": 0,
+    "190": 0
+  },
+  "ui_sha256": "2dd436c7dc8fdc85dc27c7bc4df6d643c72b6addd372694e7838457ed100485c",
+  "comfy_version": "0.37.0",
+  "frontend_version": "1.53.6",
+  "converted_at": "2026-10-09T21:39:47.387Z",
+  "config_hash": "3acc06314e8693157759e9a78cb4537182e542ed768d867695568e8fdcb3cb4b",
+  "nodes": 25,
+  "api_prompt": {
+    "92": {
+      "inputs": {
+        "filename_prefix": "<per_job:output_prefix>",
+        "format": "auto",
+        "format.codec": "auto",
+        "codec": "auto",
+        "video": [
+          "130",
+          0
+        ]
+      },
+      "class_type": "SaveVideo",
+      "_meta": {
+        "title": "Save Video"
+      }
+    },
+    "115": {
+      "inputs": {
+        "aspect_ratio": "16:9 (Widescreen)",
+        "megapixels": [
+          "192",
+          0
+        ],
+        "multiple": 32
+      },
+      "class_type": "ResolutionSelector",
+      "_meta": {
+        "title": "Resolution Selector (Size)"
+      }
+    },
+    "119": {
+      "inputs": {
+        "vae_name": "minimax_h3_video_vae_fp16.safetensors"
+      },
+      "class_type": "VAELoader",
+      "_meta": {
+        "title": "Load VAE"
+      }
+    },
+    "120": {
+      "inputs": {
+        "vae_name": "minimax_h3_audio_vae_fp32.safetensors"
+      },
+      "class_type": "VAELoader",
+      "_meta": {
+        "title": "Load VAE"
+      }
+    },
+    "121": {
+      "inputs": {
+        "samples": [
+          "125",
+          0
+        ],
+        "vae": [
+          "120",
+          0
+        ]
+      },
+      "class_type": "VAEDecodeAudio",
+      "_meta": {
+        "title": "VAE Decode Audio"
+      }
+    },
+    "123": {
+      "inputs": {
+        "sampler_name": "res_multistep"
+      },
+      "class_type": "KSamplerSelect",
+      "_meta": {
+        "title": "Stage 1 sampler"
+      }
+    },
+    "124": {
+      "inputs": {
+        "scheduler": "simple",
+        "steps": 28,
+        "denoise": 1,
+        "model": [
+          "190",
+          0
+        ]
+      },
+      "class_type": "BasicScheduler",
+      "_meta": {
+        "title": "Scheduler – total steps"
+      }
+    },
+    "125": {
+      "inputs": {
+        "noise": [
+          "129",
+          0
+        ],
+        "guider": [
+          "126",
+          0
+        ],
+        "sampler": [
+          "123",
+          0
+        ],
+        "sigmas": [
+          "124",
+          0
+        ],
+        "latent_image": [
+          "136",
+          1
+        ]
+      },
+      "class_type": "SamplerCustomAdvanced",
+      "_meta": {
+        "title": "A · Stage 1 – base (16 of 19 steps, to σ 0.692)"
+      }
+    },
+    "126": {
+      "inputs": {
+        "model": [
+          "190",
+          0
+        ],
+        "conditioning": [
+          "136",
+          0
+        ]
+      },
+      "class_type": "BasicGuider",
+      "_meta": {
+        "title": "Stage 1 guider (base model)"
+      }
+    },
+    "127": {
+      "inputs": {
+        "unet_name": "minimax_h3_fl2va_int8_convrot.safetensors",
+        "weight_dtype": "default"
+      },
+      "class_type": "UNETLoader",
+      "_meta": {
+        "title": "Load Diffusion Model"
+      }
+    },
+    "128": {
+      "inputs": {
+        "clip_name": "qwen3vl_32b_minimax_h3_int8_convrot.safetensors",
+        "type": "minimax",
+        "device": "default"
+      },
+      "class_type": "CLIPLoader",
+      "_meta": {
+        "title": "Load CLIP"
+      }
+    },
+    "129": {
+      "inputs": {
+        "noise_seed": "<per_job:seed>"
+      },
+      "class_type": "RandomNoise",
+      "_meta": {
+        "title": "RandomNoise"
+      }
+    },
+    "130": {
+      "inputs": {
+        "fps": 24,
+        "bit_depth": 8,
+        "color_space": "sRGB",
+        "codec": "none",
+        "images": [
+          "228",
+          1
+        ],
+        "audio": [
+          "121",
+          0
+        ]
+      },
+      "class_type": "CreateVideo",
+      "_meta": {
+        "title": "Create Video"
+      }
+    },
+    "131": {
+      "inputs": {
+        "expression": "max(5, round(a * 24)) + (5 - (max(5, round(a * 24)) % 17)) % 17",
+        "values.a": [
+          "132",
+          0
+        ]
+      },
+      "class_type": "ComfyMathExpression",
+      "_meta": {
+        "title": "Math Expression"
+      }
+    },
+    "132": {
+      "inputs": {
+        "value": "<per_job:duration_s>"
+      },
+      "class_type": "PrimitiveFloat",
+      "_meta": {
+        "title": "Float (Duration)"
+      }
+    },
+    "136": {
+      "inputs": {
+        "prompt": [
+          "138",
+          0
+        ],
+        "width": [
+          "115",
+          0
+        ],
+        "height": [
+          "115",
+          1
+        ],
+        "length": [
+          "131",
+          1
+        ],
+        "ref_image_size": "max",
+        "clip": [
+          "128",
+          0
+        ],
+        "vae": [
+          "119",
+          0
+        ],
+        "audio_vae": [
+          "120",
+          0
+        ],
+        "ref_images.ref_image_0": [
+          "195",
+          0
+        ]
+      },
+      "class_type": "MiniMaxH3ReferenceToVideo",
+      "_meta": {
+        "title": "MiniMax H3 Reference to Video"
+      }
+    },
+    "138": {
+      "inputs": {
+        "value": "<per_job:prompt>"
+      },
+      "class_type": "PrimitiveStringMultiline",
+      "_meta": {
+        "title": "Input Text (Prompt)"
+      }
+    },
+    "152": {
+      "inputs": {
+        "max_resolution": 1024,
+        "jpeg_quality": 80,
+        "suppress_default_preview": true,
+        "preview_frames": 600,
+        "preview_fps": 6,
+        "tiny_vae": "taeh3.safetensors",
+        "model": [
+          "127",
+          0
+        ]
+      },
+      "class_type": "ModelPreviewOverrideKJ",
+      "_meta": {
+        "title": "Model Preview Override"
+      }
+    },
+    "187": {
+      "inputs": {
+        "attention": "comfy kitchen attention",
+        "model": [
+          "152",
+          0
+        ]
+      },
+      "class_type": "ModelAttentionBackend",
+      "_meta": {
+        "title": "Model Attention Backend"
+      }
+    },
+    "190": {
+      "inputs": {
+        "selection": "sol-attn",
+        "selection.tau": 1.3,
+        "start_percent": 0.2,
+        "end_percent": 1,
+        "dense_blocks": "",
+        "min_tokens": 12288,
+        "extra_tokens": 256,
+        "sink_conditioning": "exact_kv_and_rows",
+        "verbose": false,
+        "model": [
+          "187",
+          0
+        ]
+      },
+      "class_type": "BlockSparseAttention",
+      "_meta": {
+        "title": "Model Sparse Attention"
+      }
+    },
+    "192": {
+      "inputs": {
+        "Number": "<per_job:megapixels>"
+      },
+      "class_type": "Float",
+      "_meta": {
+        "title": "Float"
+      }
+    },
+    "195": {
+      "inputs": {
+        "image": "<per_job:ref_image_0>"
+      },
+      "class_type": "LoadImage",
+      "_meta": {
+        "title": "Load Image"
+      }
+    },
+    "197": {
+      "inputs": {
+        "anything": [
+          "130",
+          0
+        ]
+      },
+      "class_type": "easy cleanGpuUsed",
+      "_meta": {
+        "title": "Clean VRAM Used"
+      }
+    },
+    "204": {
+      "inputs": {
+        "blend_mode": "legacy",
+        "samples": [
+          "125",
+          0
+        ],
+        "vae": [
+          "119",
+          0
+        ]
+      },
+      "class_type": "H3VAEDecodeBlend",
+      "_meta": {
+        "title": "H3 VAE Decode (Blend Mode)"
+      }
+    },
+    "228": {
+      "inputs": {
+        "empty_cache": true,
+        "gc_collect": true,
+        "unload_all_models": true,
+        "image_pass": [
+          "204",
+          0
+        ]
+      },
+      "class_type": "VRAM_Debug",
+      "_meta": {
+        "title": "A · free VRAM after decode"
+      }
+    }
+  }
+}

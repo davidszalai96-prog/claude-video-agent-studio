@@ -1,0 +1,145 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://claude-video-agent-studio.local/schemas/manifest.schema.json",
+  "title": "Workflow manifest",
+  "description": "How the studio may use one of the user's saved ComfyUI workflows (a project's workflow template): pipeline/comfy/manifests/<id>.json. Only the per_job values change per job; forced values and wiring are applied every time and each names its source; everything else is the user's, as saved. Node IDs are the API IDs from graphToPrompt (subgraph children as \"parent:child\").",
+  "type": "object",
+  "required": ["id", "template", "kind", "file", "ui_sha256", "status", "per_job", "outputs", "rules"],
+  "additionalProperties": false,
+  "properties": {
+    "id": { "type": "string", "pattern": "^[A-Za-z0-9][A-Za-z0-9_.-]*$" },
+    "template": { "type": "string", "description": "Saved workflow name, without .json." },
+    "kind": { "$ref": "common.schema.json#/$defs/output_kind" },
+    "file": { "type": "string", "pattern": "^workflows/.+\\.json$" },
+    "ui_sha256": { "$ref": "common.schema.json#/$defs/sha256", "description": "Hash of the saved file this manifest was made from; a different hash means the user re-saved it and the manifest must be re-checked." },
+    "status": { "enum": ["draft", "checked", "smoke_tested"] },
+    "comfy_version": { "type": "string" },
+    "frontend_version": { "type": ["string", "null"] },
+    "updated": { "$ref": "common.schema.json#/$defs/timestamp" },
+    "per_job": {
+      "type": "object",
+      "minProperties": 1,
+      "additionalProperties": {
+        "type": "object",
+        "required": ["targets", "type"],
+        "additionalProperties": false,
+        "properties": {
+          "targets": { "type": "array", "minItems": 1, "items": { "$ref": "#/$defs/target" } },
+          "type": { "enum": ["text", "int", "float", "float_string", "image", "save_prefix", "save_path", "save_filename"] },
+          "note": { "type": "string" }
+        }
+      }
+    },
+    "forced": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["node", "input", "value", "source"],
+        "additionalProperties": false,
+        "properties": {
+          "node": { "type": "string" }, "input": { "type": "string" },
+          "value": {}, "saved_value": {},
+          "source": { "type": "string", "description": "Where the user decided this, e.g. 'h3-gacha-pipeline §7 (user asked for 1440p)'." }
+        }
+      }
+    },
+    "wiring": {
+      "description": "Inputs fed by broadcast nodes (Anything Everywhere) that graphToPrompt drops; wired explicitly as [from_node, slot].",
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["node", "input", "from"],
+        "additionalProperties": false,
+        "properties": {
+          "node": { "type": "string" }, "input": { "type": "string" },
+          "from": { "type": "array", "prefixItems": [ { "type": "string" }, { "type": "integer", "minimum": 0 } ], "minItems": 2, "maxItems": 2 },
+          "source": { "type": "string" }
+        }
+      }
+    },
+    "attention": {
+      "type": "object",
+      "required": ["nodes", "profiles", "saved_profile"],
+      "additionalProperties": false,
+      "properties": {
+        "chain": { "type": "array", "items": { "type": "string" }, "description": "MODEL chain from the loader to the guider, as saved." },
+        "nodes": {
+          "type": "object",
+          "required": ["sol"],
+          "additionalProperties": false,
+          "properties": {
+            "sol": { "$ref": "#/$defs/class_node" },
+            "kitchen": { "$ref": "#/$defs/class_node" },
+            "chunk_ff": { "$ref": "#/$defs/class_node" },
+            "low_vram": { "$ref": "#/$defs/class_node" },
+            "sage_kj": { "$ref": "#/$defs/class_node" },
+            "mem_eff_sage": { "$ref": "#/$defs/class_node" }
+          }
+        },
+        "profiles": {
+          "type": "object",
+          "required": ["sol", "chunked"],
+          "propertyNames": { "enum": ["sol", "chunked", "sage"] },
+          "additionalProperties": {
+            "type": "object",
+            "required": ["modes"],
+            "additionalProperties": false,
+            "properties": {
+              "modes": { "type": "object", "additionalProperties": { "enum": [0, 4] } },
+              "verified": { "type": "string", "description": "Snapshot that proved the conversion honours this profile." }
+            }
+          }
+        },
+        "saved_profile": { "enum": ["sol", "chunked", "sage", "other"] }
+      }
+    },
+    "preview_node": { "type": "string", "description": "The live preview the user watches; never touched." },
+    "outputs": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "required": ["node", "class", "kind"],
+        "additionalProperties": false,
+        "properties": { "node": { "type": "string" }, "class": { "type": "string" }, "kind": { "enum": ["video", "image"] } }
+      }
+    },
+    "required_classes": { "type": "array", "items": { "type": "string" } },
+    "default_profile": { "type": "string" },
+    "snapshot": { "type": "string" },
+    "measured": {
+      "type": "object",
+      "additionalProperties": {
+        "type": "object",
+        "required": ["status"],
+        "additionalProperties": false,
+        "properties": {
+          "status": { "enum": ["unmeasured", "measured"] },
+          "minutes": { "type": "array", "items": { "type": "number" }, "minItems": 2, "maxItems": 2 },
+          "seconds_per_image": { "type": "array", "items": { "type": "number" }, "minItems": 2, "maxItems": 2 },
+          "peak_vram_gb": { "type": ["number", "null"] },
+          "source": { "type": "string" }
+        }
+      }
+    },
+    "rules": { "type": "array", "items": { "type": "string" } }
+  },
+  "allOf": [
+    { "if": { "properties": { "kind": { "const": "h3" } } }, "then": { "required": ["attention", "preview_node"] } },
+    { "if": { "properties": { "kind": { "const": "krea" } } }, "then": { "not": { "required": ["attention"] } } }
+  ],
+  "$defs": {
+    "target": {
+      "type": "object",
+      "required": ["node", "input"],
+      "additionalProperties": false,
+      "properties": { "node": { "type": "string" }, "input": { "type": "string" } }
+    },
+    "class_node": {
+      "type": "object",
+      "required": ["node", "class"],
+      "additionalProperties": false,
+      "properties": { "node": { "type": "string" }, "class": { "type": "string" } }
+    }
+  }
+}

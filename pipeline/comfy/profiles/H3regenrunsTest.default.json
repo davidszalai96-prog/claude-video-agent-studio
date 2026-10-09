@@ -1,0 +1,237 @@
+{
+  "template": "H3regenrunsTest",
+  "ui_sha256": "2dd436c7dc8fdc85dc27c7bc4df6d643c72b6addd372694e7838457ed100485c",
+  "config_hash": "64736b7305f2298850e2a1cfb79c0ffd7ca6c16ddd85c3897b2f7307c3e4390b",
+  "created": "2026-10-09T23:40:17+02:00",
+  "note": "Every value as the user saved it; per-job values are placeholders. Run requests show changes as a diff against this file.",
+  "ui_modes": {
+    "92": 0,
+    "115": 0,
+    "116": 0,
+    "117": 0,
+    "119": 0,
+    "120": 0,
+    "121": 0,
+    "122": 4,
+    "123": 0,
+    "124": 0,
+    "125": 0,
+    "126": 0,
+    "127": 0,
+    "128": 0,
+    "129": 0,
+    "130": 0,
+    "131": 0,
+    "132": 0,
+    "136": 0,
+    "138": 0,
+    "140": 0,
+    "152": 0,
+    "153": 0,
+    "154": 4,
+    "155": 4,
+    "157": 4,
+    "158": 4,
+    "159": 0,
+    "186": 4,
+    "187": 4,
+    "190": 4,
+    "192": 0,
+    "193": 4,
+    "195": 0,
+    "197": 0,
+    "198": 4,
+    "200": 4,
+    "201": 4,
+    "202": 4,
+    "203": 4,
+    "204": 0,
+    "209": 4,
+    "210": 4,
+    "211": 4,
+    "212": 4,
+    "213": 4,
+    "214": 4,
+    "215": 4,
+    "216": 4,
+    "217": 4,
+    "218": 4,
+    "219": 4,
+    "220": 4,
+    "221": 4,
+    "222": 4,
+    "223": 4,
+    "224": 4,
+    "225": 0,
+    "226": 4,
+    "228": 0,
+    "229": 4,
+    "230": 4,
+    "231": 4,
+    "232": 4,
+    "233": 4,
+    "234": 4
+  },
+  "values": {
+    "92": {
+      "class": "SaveVideo",
+      "inputs": {
+        "filename_prefix": "<per_job:output_prefix>",
+        "format": "auto",
+        "format.codec": "auto",
+        "codec": "auto"
+      }
+    },
+    "115": {
+      "class": "ResolutionSelector",
+      "inputs": {
+        "aspect_ratio": "16:9 (Widescreen)",
+        "multiple": 32
+      }
+    },
+    "119": {
+      "class": "VAELoader",
+      "inputs": {
+        "vae_name": "minimax_h3_video_vae_fp16.safetensors"
+      }
+    },
+    "120": {
+      "class": "VAELoader",
+      "inputs": {
+        "vae_name": "minimax_h3_audio_vae_fp32.safetensors"
+      }
+    },
+    "121": {
+      "class": "VAEDecodeAudio",
+      "inputs": {}
+    },
+    "123": {
+      "class": "KSamplerSelect",
+      "inputs": {
+        "sampler_name": "res_multistep"
+      }
+    },
+    "124": {
+      "class": "BasicScheduler",
+      "inputs": {
+        "scheduler": "simple",
+        "steps": 28,
+        "denoise": 1
+      }
+    },
+    "125": {
+      "class": "SamplerCustomAdvanced",
+      "inputs": {}
+    },
+    "126": {
+      "class": "BasicGuider",
+      "inputs": {}
+    },
+    "127": {
+      "class": "UNETLoader",
+      "inputs": {
+        "unet_name": "minimax_h3_fl2va_int8_convrot.safetensors",
+        "weight_dtype": "default"
+      }
+    },
+    "128": {
+      "class": "CLIPLoader",
+      "inputs": {
+        "clip_name": "qwen3vl_32b_minimax_h3_int8_convrot.safetensors",
+        "type": "minimax",
+        "device": "default"
+      }
+    },
+    "129": {
+      "class": "RandomNoise",
+      "inputs": {
+        "noise_seed": "<per_job:seed>"
+      }
+    },
+    "130": {
+      "class": "CreateVideo",
+      "inputs": {
+        "fps": 24,
+        "bit_depth": 8,
+        "color_space": "sRGB",
+        "codec": "none"
+      }
+    },
+    "131": {
+      "class": "ComfyMathExpression",
+      "inputs": {
+        "expression": "max(5, round(a * 24)) + (5 - (max(5, round(a * 24)) % 17)) % 17"
+      }
+    },
+    "132": {
+      "class": "PrimitiveFloat",
+      "inputs": {
+        "value": "<per_job:duration_s>"
+      }
+    },
+    "136": {
+      "class": "MiniMaxH3ReferenceToVideo",
+      "inputs": {
+        "ref_image_size": "max"
+      }
+    },
+    "138": {
+      "class": "PrimitiveStringMultiline",
+      "inputs": {
+        "value": "<per_job:prompt>"
+      }
+    },
+    "152": {
+      "class": "ModelPreviewOverrideKJ",
+      "inputs": {
+        "max_resolution": 1024,
+        "jpeg_quality": 80,
+        "suppress_default_preview": true,
+        "preview_frames": 600,
+        "preview_fps": 6,
+        "tiny_vae": "taeh3.safetensors"
+      }
+    },
+    "153": {
+      "class": "MiniMaxH3MemoryEfficientSageAttentionPatch",
+      "inputs": {}
+    },
+    "159": {
+      "class": "PathchSageAttentionKJ",
+      "inputs": {
+        "sage_attention": "auto",
+        "allow_compile": false
+      }
+    },
+    "192": {
+      "class": "Float",
+      "inputs": {
+        "Number": "<per_job:megapixels>"
+      }
+    },
+    "195": {
+      "class": "LoadImage",
+      "inputs": {
+        "image": "<per_job:ref_image_0>"
+      }
+    },
+    "197": {
+      "class": "easy cleanGpuUsed",
+      "inputs": {}
+    },
+    "204": {
+      "class": "H3VAEDecodeBlend",
+      "inputs": {
+        "blend_mode": "legacy"
+      }
+    },
+    "228": {
+      "class": "VRAM_Debug",
+      "inputs": {
+        "empty_cache": true,
+        "gc_collect": true,
+        "unload_all_models": true
+      }
+    }
+  }
+}

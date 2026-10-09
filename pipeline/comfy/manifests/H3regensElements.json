@@ -1,0 +1,184 @@
+{
+  "id": "H3regensElements",
+  "template": "H3regensElements",
+  "kind": "krea",
+  "file": "workflows/H3regensElements.json",
+  "ui_sha256": "9def8cf4dcf1ad022c6165c136d290b9082bcd9180703c7574aa25d2232d70c8",
+  "status": "checked",
+  "comfy_version": "0.37.0",
+  "updated": "2026-10-09T23:40:02+02:00",
+  "per_job": {
+    "prompt": {
+      "targets": [
+        {
+          "node": "46",
+          "input": "value"
+        }
+      ],
+      "type": "text"
+    },
+    "seed": {
+      "targets": [
+        {
+          "node": "187",
+          "input": "seed"
+        },
+        {
+          "node": "128",
+          "input": "seed"
+        }
+      ],
+      "type": "int",
+      "note": "set explicitly: the easy globalSeed randomizer (63) does not run over the API"
+    },
+    "output_path": {
+      "targets": [
+        {
+          "node": "156:155",
+          "input": "path"
+        }
+      ],
+      "type": "save_path"
+    },
+    "output_filename": {
+      "targets": [
+        {
+          "node": "156:155",
+          "input": "filename"
+        }
+      ],
+      "type": "save_filename"
+    }
+  },
+  "outputs": [
+    {
+      "node": "156:155",
+      "class": "Image Saver",
+      "kind": "image"
+    }
+  ],
+  "rules": [
+    "one GPU job at a time",
+    "never use video references",
+    "change only per_job values; forced and wiring entries name their source",
+    "Krea stills never use sol-attn",
+    "wordless, unlabeled grids (h3-gacha-pipeline §7)"
+  ],
+  "forced": [
+    {
+      "node": "56:54",
+      "input": "switch",
+      "value": false,
+      "saved_value": [
+        "56:50",
+        0
+      ],
+      "source": "h3-gacha-pipeline §7: force the raw prompt (switch false); as saved, the switch is wired to 56:50, which the enhancer logic drives"
+    },
+    {
+      "node": "13",
+      "input": "width",
+      "value": 2560,
+      "saved_value": 1920,
+      "source": "h3-gacha-pipeline §7: the user asked for 1440p after a 1080p standee came out with mismatched eyes"
+    },
+    {
+      "node": "13",
+      "input": "height",
+      "value": 1440,
+      "saved_value": 1080,
+      "source": "h3-gacha-pipeline §7: as above"
+    }
+  ],
+  "wiring": [
+    {
+      "node": "203",
+      "input": "clip",
+      "from": [
+        "6",
+        0
+      ],
+      "source": "h3-gacha-pipeline §7: Anything Everywhere input"
+    },
+    {
+      "node": "56:55",
+      "input": "clip",
+      "from": [
+        "6",
+        0
+      ],
+      "source": "h3-gacha-pipeline §7: Anything Everywhere input"
+    },
+    {
+      "node": "195",
+      "input": "vae",
+      "from": [
+        "5",
+        0
+      ],
+      "source": "h3-gacha-pipeline §7: Anything Everywhere input"
+    },
+    {
+      "node": "109:99",
+      "input": "vae",
+      "from": [
+        "5",
+        0
+      ],
+      "source": "h3-gacha-pipeline §7: Anything Everywhere input"
+    }
+  ],
+  "measured": {
+    "default": {
+      "status": "measured",
+      "seconds_per_image": [
+        35,
+        38
+      ],
+      "peak_vram_gb": null,
+      "source": "h3-gacha-pipeline §7 at 1080p; re-measure at 2560x1440"
+    }
+  },
+  "default_profile": "pipeline/comfy/profiles/H3regensElements.default.json",
+  "snapshot": "pipeline/comfy/snapshots/H3regensElements/20261009_as_saved_e8fa52ebc974.api.json",
+  "frontend_version": "1.53.6",
+  "required_classes": [
+    "Any Switch (rgthree)",
+    "Anything Everywhere",
+    "CLIPLoader",
+    "CLIPTextEncode",
+    "Civitai Hash Fetcher (Image Saver)",
+    "ClownsharKSampler_Beta",
+    "ComfyOrNode",
+    "ComfySwitchNode",
+    "ConditioningZeroOut",
+    "EmptyLatentImage",
+    "GetImageSize",
+    "Image Comparer (rgthree)",
+    "Image Saver",
+    "ImpactIfNone",
+    "JoinStrings",
+    "Power Lora Loader (rgthree)",
+    "PreviewAny",
+    "PrimitiveString",
+    "PrimitiveStringMultiline",
+    "RegexExtract",
+    "RegexReplace",
+    "ResolutionMaster",
+    "Seed",
+    "Seed (rgthree)",
+    "TextGenerate",
+    "UNETLoader",
+    "VAEDecode",
+    "VAELoader",
+    "WidgetToString",
+    "Workflow Input Value (Image Saver)",
+    "easy cleanGpuUsed",
+    "easy float",
+    "easy globalSeed",
+    "easy imageSize",
+    "easy int",
+    "easy showAnything",
+    "easy simpleMath"
+  ]
+}

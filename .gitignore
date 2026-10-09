@@ -49,3 +49,6 @@ __pycache__/
 *.pyc
 .venv/
 .pytest_cache/
+
+# Raw page output from the studio tab (contains per-job prompts); ingested into snapshots
+pipeline/comfy/incoming/

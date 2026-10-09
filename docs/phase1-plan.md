@@ -79,6 +79,21 @@ C:\CU\output\studio\<CODE>\units\   ComfyUI writes takes here (created in Phase 
 
 These three become the first entries in the manifest library. They are not defaults.
 
+*Built 2026-10-09:*
+- `bridge/comfy_api.py`: read-only shell client (status, queue, history, wait, logs, progress age, environment pin, pre-job checks). There is no submit command.
+- `bridge/page_recipes.js`: `window.studio` in the studio tab (load a saved file, set modes, graphToPrompt, send).
+- `bridge/receiver.py`: a loopback receiver, so page output reaches disk without copy-paste.
+- `manifest_tool.py`: list, inspect, init (H3 auto-detection), modes, ingest and check.
+- `manifest.schema.json`, and `env_pin.json` (ComfyUI 0.37.0, frontend 1.53.6, 119 custom node packs).
+- All three manifests pass `check`. The `sol`, `chunked` and `sage` conversions were verified on the real files, and the preview node 152 stays as saved.
+- 12 more tests (59 in total).
+
+*Found in step 6:*
+- **ComfyUI blocks extension-started navigations.** Its server answers 403 to any request marked `Sec-Fetch-Site: cross-site` (`server.py:162`), which Chrome sets when the extension opens a URL. So the user opens the studio tab once by typing the address. The tab's own `location.reload()` works afterwards. The restart path for unattended windows is designed in step 7, without weakening that protection.
+- **The extension forgets its tab group when it reconnects.** It then needs the studio tab opened again.
+- **Krea template:** node 13 is saved at 1920×1080, and the manifest forces 2560×1440 as `h3-gacha-pipeline` §7 records. Also, `56:54.switch` is saved wired to `56:50`, and the skill's patch forces it to `false`.
+- **Node labels:** ComfyUI reports several packs' nodes as `comfyui-workflow-encrypt`, because that extension re-exports the global node list. It is a labeling quirk; the environment pin goes by folder.
+
 Plus `bridge/comfy_api.py` (status, queue, history, free, outputs, logs; no submit until step 8's check exists), `bridge/page_recipes.js` and `skills/comfy-bridge/SKILL.md`. Nothing is queued.
 
 **Step 7: watchdog and restart**
