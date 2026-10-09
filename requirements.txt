@@ -1,0 +1,11 @@
+# Studio venv (.venv), separate from ComfyUI's C:\CUVenv.
+# Phase 1: schemas, tickets, ComfyUI bridge (HTTP + websocket), watchdog, tests.
+jsonschema==4.26.0
+PyYAML==6.0.3
+requests==2.34.2
+websocket-client==1.9.2
+psutil==7.2.2
+nvidia-ml-py==13.615.71
+pytest==9.1.1
+# Media stack, added when Phase 2 first needs it:
+# numpy opencv-python scenedetect librosa onnxruntime Pillow soundfile opentimelineio

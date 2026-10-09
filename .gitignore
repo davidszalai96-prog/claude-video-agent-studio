@@ -7,21 +7,33 @@ geminiapi.txt
 # Local Claude Code settings
 .claude/settings.local.json
 
-# Media never goes into git
+# Media and model files never go into git
 *.mp4
 *.mov
 *.mkv
 *.webm
+*.avi
+*.mxf
 *.wav
 *.mp3
 *.flac
 *.aac
+*.m4a
+*.ogg
 *.png
 *.jpg
 *.jpeg
 *.webp
 *.exr
 *.gif
+*.tif
+*.tiff
+*.bmp
+*.psd
+*.safetensors
+*.ckpt
+*.onnx
+*.drp
 
 # Project working data (renders, previews, caches)
 projects/*/06_dailies/**/sheets/
@@ -29,7 +41,11 @@ projects/*/07_edit/previews/
 projects/*/08_finish/renders/
 projects/*/09_delivery/
 
+# Watchdog runtime state (PIDs, heartbeats)
+pipeline/watchdog/runtime/
+
 # Python
 __pycache__/
 *.pyc
 .venv/
+.pytest_cache/

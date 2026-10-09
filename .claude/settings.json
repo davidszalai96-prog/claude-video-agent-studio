@@ -1,0 +1,44 @@
+{
+  "$schema": "https://json.schemastore.org/claude-code-settings.json",
+  "permissions": {
+    "allow": [
+      "Edit(/**)",
+      "Read(//c/CU/user/default/workflows/**)",
+      "Read(//c/CU/output/**)",
+      "Read(//c/CU/input/**)",
+      "Edit(//c/CU/output/studio/**)",
+      "Bash(git status *)",
+      "Bash(git diff *)",
+      "Bash(git log *)",
+      "Bash(git show *)",
+      "Bash(git branch *)",
+      "Bash(git remote -v)",
+      "PowerShell(git status *)",
+      "PowerShell(git diff *)",
+      "PowerShell(git log *)",
+      "PowerShell(git show *)",
+      "Bash(nvidia-smi *)",
+      "PowerShell(nvidia-smi *)",
+      "Bash(ffprobe *)",
+      "PowerShell(ffprobe *)"
+    ],
+    "ask": [
+      "Bash(git push *)",
+      "PowerShell(git push *)",
+      "Edit(/.claude/settings.json)",
+      "Edit(/.claude/hooks/**)",
+      "Edit(/.mcp.json)"
+    ],
+    "deny": [
+      "Read(//d/**)",
+      "Edit(//d/**)",
+      "Read(//**/geminiapi.txt)",
+      "Edit(//**/geminiapi.txt)",
+      "Read(//**/.env)",
+      "Edit(//**/.env)",
+      "Edit(/projects/*/00_admin/approvals/**)",
+      "Bash(git push --force *)",
+      "PowerShell(git push --force *)"
+    ]
+  }
+}

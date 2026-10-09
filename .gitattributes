@@ -1,0 +1,6 @@
+# Text files use LF everywhere; Windows script files use CRLF.
+* text=auto eol=lf
+*.ps1 text eol=crlf
+*.psm1 text eol=crlf
+*.cmd text eol=crlf
+*.bat text eol=crlf
