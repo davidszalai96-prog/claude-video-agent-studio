@@ -1,0 +1,21 @@
+{
+  "recorded": "2026-10-09",
+  "launcher": "C:\\Users\\david\\Desktop\\ComfyUI.bat",
+  "launcher_lines": [
+    "@echo off",
+    "call \"C:\\Program Files\\Microsoft Visual Studio\\18\\Community\\VC\\Auxiliary\\Build\\vcvars64.bat\"",
+    "call \"C:\\CUVenv\\Scripts\\activate.bat\"",
+    "cd /d \"C:\\CU\"",
+    "python main.py --cuda-device 0 --disable-pinned-memory --disable-comfy-compiler"
+  ],
+  "python_args": ["main.py", "--cuda-device", "0", "--disable-pinned-memory", "--disable-comfy-compiler"],
+  "observed_process_tree": [
+    "python.exe (C:\\Program Files\\Python312, listens on 8188): main.py ...",
+    "python.exe (C:\\CUVenv\\Scripts launcher): python main.py ...",
+    "cmd.exe /c \"C:\\Users\\david\\Desktop\\ComfyUI.bat\"  <- the console window",
+    "explorer.exe (the user double-clicked the launcher)"
+  ],
+  "close": "taskkill /T /F on the cmd.exe that runs ComfyUI.bat: ends that console and its python children, nothing else",
+  "relaunch": "explorer.exe \"C:\\Users\\david\\Desktop\\ComfyUI.bat\": the same as a double-click, so the new ComfyUI is not a child of the studio's processes",
+  "other_launchers_on_desktop": ["ComfyUINSFW.bat", "ComfyUINSFWSD.bat", "ComfyUI - LTX2.bat", "ComfyCustomNodeInstallation.bat"]
+}

@@ -96,6 +96,38 @@ def on_d_drive(path: str) -> bool:
     return ntpath.splitdrive(str(path))[0].upper() == "D:"
 
 
+def approved_window(project: Path, run_id: str) -> tuple[dict | None, str | None]:
+    """The window the user approved for a run ticket, or None and the reason it doesn't hold.
+
+    Trusts only the hook-written record in 00_admin/approvals/<run_id>.json, and only while the ticket
+    file still has the hash the user approved.
+    """
+    rec_path = Path(project) / "00_admin" / "approvals" / f"{run_id}.json"
+    if not rec_path.exists():
+        return None, f"no recorded approval for {run_id}"
+    try:
+        rec = load_json(rec_path)
+    except ValueError as e:
+        return None, f"approval record unreadable: {e}"
+    if schema_errors("approval", rec):
+        return None, "approval record does not match its schema"
+    if rec["kind"] != "run_ticket" or rec.get("run_id") != run_id:
+        return None, "approval record is not for this run ticket"
+    if rec["decision"] != "approved":
+        return None, f"{run_id} was not approved"
+    ticket = Path(project) / rec["subject"]
+    if not ticket.exists() or sha256_file(ticket) != rec["subject_sha256"]:
+        return None, f"{rec['subject']} changed after the user approved it"
+    return rec["window"], None
+
+
+def window_state(window: dict, now: datetime | None = None) -> str:
+    """'before', 'open' or 'ended' for an approved window."""
+    now = now or datetime.now().astimezone()
+    start, end = parse_ts(window["start"]), parse_ts(window["end"])
+    return "before" if now < start else ("open" if now < end else "ended")
+
+
 def footage_folder_problem(path: str, output_root: str = COMFY_OUTPUT) -> str | None:
     """Why a footage folder is not allowed, or None when it is fine."""
     if on_d_drive(path):

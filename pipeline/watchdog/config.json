@@ -1,0 +1,31 @@
+{
+  "about": "VRAM watchdog settings. Values marked 'design' come from docs/studio-design.md (Tool layer, ComfyUI restart procedure) as proposed defaults; tune them from the VRAM log.",
+  "port": 8188,
+  "poll_s": 15,
+  "progress_timeout_s": 300,
+  "startup_timeout_s": 600,
+  "api_timeout_s": 120,
+  "sample_every_s": 60,
+  "restart_wait_s": 15,
+  "start_timeout_s": 180,
+  "max_restarts_per_window": 2,
+  "released_max_used_gb": 8,
+  "headroom_margin_gb": 1.5,
+  "unmeasured_required_gb": 26,
+  "gpu_heavy_processes": [
+    "Resolve.exe",
+    "Fusion.exe",
+    "blender.exe"
+  ],
+  "sources": {
+    "progress_timeout_s": "design: no progress for 5 min while a job runs (about five steps at 45-70 s each)",
+    "api_timeout_s": "design: no API answer for 2 min",
+    "restart_wait_s": "design: wait 15 s after closing",
+    "start_timeout_s": "design: alert after 3 min without an API answer",
+    "max_restarts_per_window": "design: two restarts per window; a third halt ends the window",
+    "startup_timeout_s": "added in Phase 1 step 7: before a job's first sampler step there is no progress line (model load, text encode)",
+    "released_max_used_gb": "added in Phase 1 step 7: Windows reports no per-process VRAM, so 'memory released' means total used falls below this; idle desktop use was 3.6 GB on 2026-10-09",
+    "headroom_margin_gb": "added in Phase 1 step 7: safety margin on top of a configuration's recorded peak",
+    "unmeasured_required_gb": "added in Phase 1 step 7: required free VRAM for a configuration with no recorded peak yet (nearly the whole 32 GB card); replaced by the measured peak after the first run"
+  }
+}

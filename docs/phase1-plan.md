@@ -102,6 +102,32 @@ Plus `bridge/comfy_api.py` (status, queue, history, free, outputs, logs; no subm
 - `config.json` (5-minute progress timeout, 2-minute API timeout, 15 s wait, 3-minute start timeout, two restarts per window) and `comfyui_launch.json` (exact launcher path and arguments).
 - `skills/vram-watch/SKILL.md` and dry-run tests.
 
+*Built 2026-10-09:*
+- `vram_watch.py` has four commands: `headroom`, `launch-check`, `watch` (real only inside an approved, open window; `--dry-run` never ends or starts a process) and `simulate` (six scripted scenarios).
+- `restart_comfyui.ps1 -DryRun` lists the exact processes a restart would end, and the relaunch command.
+- `config.json`, plus `comfyui_launch.json` recording `C:\Users\david\Desktop\ComfyUI.bat`, its arguments and the observed process tree.
+- `studio_lib.approved_window()`, which step 8's hooks reuse.
+- The vram-watch skill, and 15 more tests (74 in total).
+
+*Dry runs on 2026-10-09:*
+- The launch check passes.
+- Headroom: 27.9 GB free, so a 24 GB peak passes and a 30 GB peak is refused.
+- One minute of live watching ended cleanly at the window's end.
+- The restart dry run found exactly `cmd.exe /c ComfyUI.bat` → venv python → `Python312\python.exe` on 8188.
+
+*Decisions made in step 7 (proposed defaults, tunable in `config.json`):*
+- **No first step:** a job without its first sampler step after 10 min counts as halted, because model load and text encode print no progress lines.
+- **Memory released:** means total GPU use below 8 GB, because Windows reports no per-process VRAM. Idle use was 3.6 GB.
+- **Unmeasured configurations:** need 26 GB free until their peak is recorded.
+- **Relaunch:** ComfyUI is relaunched through `explorer.exe`, like a double-click, so it doesn't belong to Claude Code's processes and can't be closed with them.
+
+*The studio tab after a restart:*
+- The page reloads itself (`location.reload()`) once the API answers. That reload is not cross-site, so ComfyUI's 403 check doesn't apply.
+- If the tab ever shows an error page, the window ends and the user reopens the tab.
+- ComfyUI's protection stays on.
+
+*Still to do:* the live restart test (close, wait 15 s, reopen, API answers), in a window the user approves, with no job running.
+
 **Step 8: guardrail hooks** in `.claude/hooks/`:
 - `guard-paths.ps1`: blocks any D: path and any write outside the allowed roots. Write and Edit are blocked exactly. Bash and PowerShell commands are checked best-effort for redirections and file cmdlets.
 - `guard-comfy-submit.ps1`: blocks `/api/prompt` POSTs from the shell or the Chrome JavaScript tool without an approved ticket whose window is open.
