@@ -109,10 +109,25 @@ Plus `bridge/comfy_api.py` (status, queue, history, free, outputs, logs; no subm
   - it subscribes over its own websocket (`PATCH /internal/logs/subscribe`), with `/internal/logs/raw` as a polling fallback;
   - every entry is timestamped, and the sampler's step counter is in it (`app/logger.py` keeps `\r` progress updates);
   - it also reads `/api/queue`, `/api/history` and nvidia-smi.
-- Risk: `/internal/*` is marked as frontend-only, so a ComfyUI update could change it. The environment pin and the smoke test catch that.
 - Checked read-only in step 7; the live test waits for an approved window.
 
-**F. The approval flow must be unforgeable.** If the run-ticket check only reads a JSON file, an agent could write "approved" itself.
+**E2. ComfyUI updates.** You use ComfyUI outside the studio too, and you will update it. Two things the studio relies on are internal to ComfyUI and can change in any update: the `/internal/logs` feed that the watchdog reads, and the page functions used to open and convert workflows (`openWorkflow`, `graphToPrompt`).
+*Proposal:*
+- The studio records the ComfyUI version it was tested with (0.37.0 on 2026-10-09).
+- Before any studio job, the bridge compares that version, and it runs read-only checks on any change: the log feed shows sampler steps, each workflow converts, and the manifest node IDs still match.
+- If a check fails, nothing is queued and you get a report of what broke. An update can stop the studio, but it can never leave a job running unwatched.
+
+**F. Approval policy (decided 2026-10-09).** Where approval is needed is your choice for each project. The Producer asks at intake and stores the answer in `project.yaml` under `approvals:`. The defaults:
+- **H3:** you approve a batch of jobs plus a time window (the design's run ticket).
+- **H3 retakes inside an approved batch:** the studio may retake a failed unit once, changing one variable (new seed, or one wording change). It does so only while the ticket's GPU-minute cap and window still hold. Every retake appears in the end-of-window report. Anything beyond that becomes a retake request, as in the design.
+- **Krea stills (sheets and keyframes):**
+  - No approval is needed. This changes KICKOFF's hard rule for stills only; H3 and every other workflow still need a ticket.
+  - Each still may be retaken up to 3 times when its details are off.
+  - After each retake, the candidates are shown to you to choose from, and generation continues meanwhile. If you haven't chosen by the time a later task needs the still, the agent chooses (the Asset Designer, with the Director for hero characters). Your later choice still replaces the agent's choice, up to the point where an H3 unit has used that still; after that, a change is a Tier 4 change.
+  - *Proposed safety rule for stills,* because you also use ComfyUI yourself: a still is queued only when ComfyUI's queue is empty and no H3 job is running. Stills are queued one at a time, so your own jobs wait at most one still (about 35 s). Outside an approved window the watchdog never restarts ComfyUI; it stops and tells you.
+- **Enforcement:** the submit hook allows a job without a ticket only when it comes from a workflow whose manifest is marked as a still (H3regensElements today). A prompt that contains an H3 node, or that comes from any unmarked workflow, needs an approved ticket with an open window.
+
+**F2. Recording an approval so it can't be forged.** If the run-ticket check only reads a JSON file, an agent could write "approved" itself.
 *Proposal:* approval comes only from your answer in chat. The Producer asks with a question that names the ticket and the window. A `PostToolUse` hook records your answer to `00_admin/run_tickets/approvals/R-###.json`. A `PreToolUse` hook blocks every agent write to that folder. The submit hook, the bridge and the watchdog all trust only those records plus the clock.
 *Fallback,* if the Desktop app doesn't pass answers to hooks: you run one approve command in your own terminal.
 
@@ -150,7 +165,7 @@ Plus `bridge/comfy_api.py` (status, queue, history, free, outputs, logs; no subm
 Your "OK" accepts the proposals as written. Change any of them by number:
 
 1. ~~Studio venv at `.venv`, light packages now (3.A).~~ Approved.
-2. The approval flow through your chat answer, recorded by a hook (3.F).
+2. ~~Approval policy (3.F).~~ Decided. Still open: the safety rule for stills (only when ComfyUI is idle, one at a time).
 3. The write allowlist plus scratch and memory folders (3.G).
 4. A dedicated studio ComfyUI tab (3.D). Jobs run in that tab, so that is where you watch progress and the preview node. The alternative is your own tab, with the unsaved-edit check before each reload.
 5. Only the three named workflows (3.H).
