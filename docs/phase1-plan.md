@@ -100,7 +100,7 @@ Plus `bridge/comfy_api.py` (status, queue, history, free, outputs, logs; no subm
 - *Proposal:* the studio is launched with `claude --agent producer --chrome`, or with `"agent": "producer"` in `.claude/settings.local.json` for the Desktop app, once Phase 1 is done.
 
 **D. Reloading your ComfyUI tab.** The working recipe (openWorkflow, then reload the page) changes what your tab shows, and it can drop unsaved edits in an open workflow.
-*Proposal:* the studio opens its own ComfyUI tab in Chrome, which is the same server and the same queue that you see. Before any reload it checks for unsaved workflows and stops if there are any.
+*Approved 2026-10-09:* the studio opens its own ComfyUI tab in Chrome, which is the same server and the same queue that you see. Before any reload it checks for unsaved workflows and stops if there are any.
 
 **E. Jobs run in the browser; the watchdog follows the console log.** You need to watch each job's progress and its preview node in ComfyUI. ComfyUI sends `progress`, preview and `executed` messages only to the websocket of the client that queued the job (`main.py:448`, `execution.py:737`). Connecting with the browser's clientId would replace your tab's socket (`server.py:281`).
 *Decided (2026-10-09):*
@@ -117,31 +117,55 @@ Plus `bridge/comfy_api.py` (status, queue, history, free, outputs, logs; no subm
 - Before any studio job, the bridge compares that version, and it runs read-only checks on any change: the log feed shows sampler steps, each workflow converts, and the manifest node IDs still match.
 - If a check fails, nothing is queued and you get a report of what broke. An update can stop the studio, but it can never leave a job running unwatched.
 
-**F. Approval policy (decided 2026-10-09).** Where approval is needed is your choice for each project. The Producer asks at intake and stores the answer in `project.yaml` under `approvals:`. The defaults:
+**F. Approval policy (decided 2026-10-09).**
+- You define the approval process for each project when the project is defined. The Producer's intake interview always asks; it never assumes.
+- Your answer is recorded as the project's approval policy, the same unforgeable way as an approval (F2). Agents cannot write or change it.
+- Until a project's policy is recorded, the strictest rule applies: nothing is queued without an approved ticket, stills included.
+- The intake offers the answers you gave on 2026-10-09 as a starting point, which you can change per project:
 - **H3:** you approve a batch of jobs plus a time window (the design's run ticket).
 - **H3 retakes inside an approved batch:** the studio may retake a failed unit once, changing one variable (new seed, or one wording change). It does so only while the ticket's GPU-minute cap and window still hold. Every retake appears in the end-of-window report. Anything beyond that becomes a retake request, as in the design.
 - **Krea stills (sheets and keyframes):**
   - No approval is needed. This changes KICKOFF's hard rule for stills only; H3 and every other workflow still need a ticket.
   - Each still may be retaken up to 3 times when its details are off.
   - After each retake, the candidates are shown to you to choose from, and generation continues meanwhile. If you haven't chosen by the time a later task needs the still, the agent chooses (the Asset Designer, with the Director for hero characters). Your later choice still replaces the agent's choice, up to the point where an H3 unit has used that still; after that, a change is a Tier 4 change.
-  - *Proposed safety rule for stills,* because you also use ComfyUI yourself: a still is queued only when ComfyUI's queue is empty and no H3 job is running. Stills are queued one at a time, so your own jobs wait at most one still (about 35 s). Outside an approved window the watchdog never restarts ComfyUI; it stops and tells you.
-- **Enforcement:** the submit hook allows a job without a ticket only when it comes from a workflow whose manifest is marked as a still (H3regensElements today). A prompt that contains an H3 node, or that comes from any unmarked workflow, needs an approved ticket with an open window.
+  - *Safety rule for stills,* asked at intake with the policy, because you also use ComfyUI yourself: a still is queued only when ComfyUI's queue is empty and no H3 job is running. Stills are queued one at a time, so your own jobs wait at most one still (about 35 s). Outside an approved window the watchdog never restarts ComfyUI; it stops and tells you.
+- **Enforcement:** the submit hook reads the project's recorded policy. Under the starting-point policy, it allows a job without a ticket only when it comes from a workflow whose manifest is marked as a still (H3regensElements today). A prompt that contains an H3 node, or that comes from any unmarked workflow, needs an approved ticket with an open window.
 
 **F2. Recording an approval so it can't be forged.** If the run-ticket check only reads a JSON file, an agent could write "approved" itself.
-*Proposal:* approval comes only from your answer in chat. The Producer asks with a question that names the ticket and the window. A `PostToolUse` hook records your answer to `00_admin/run_tickets/approvals/R-###.json`. A `PreToolUse` hook blocks every agent write to that folder. The submit hook, the bridge and the watchdog all trust only those records plus the clock.
+*Proposal (how decision 2 is enforced):* approvals and the project's approval policy come only from your answers in chat. The Producer asks with a question that names the ticket and the window. A `PostToolUse` hook records your answer to `00_admin/approvals/` (`policy.json` and `R-###.json`). A `PreToolUse` hook blocks every agent write to that folder. The submit hook, the bridge and the watchdog all trust only those records plus the clock.
 *Fallback,* if the Desktop app doesn't pass answers to hooks: you run one approve command in your own terminal.
 
 **G. Write allowlist.** The design allows writes only to the repo and `C:\CU\output\studio`. That would also block Claude Code's own scratch folder (`%TEMP%\claude\…`) and this project's memory folder (`~\.claude\projects\C--claude-video-agent-studio\memory`).
-*Proposal:* allow those two as well. The hooks also guard the Gemini key file, which the KICKOFF rules require but step 8 doesn't list.
+*Approved 2026-10-09:* allow those two as well. The hooks also guard the Gemini key file, which the KICKOFF rules require but step 8 doesn't list.
 
-**H. Workflows.** All three named workflows are present (last saved 5 Oct). Newer H3 workflows exist too: H3ultRefsTest3, H3ultSingleRef, H3ultSingleRefSparse, H3ult_Solenne_v3–v5 and H3ult_Xiaoyu_v1–v3. *Proposal:* step 6 does only the three named ones. Others become production workflows only when you say so.
+**H. Workflows (open, see the expansion below).** All three named workflows are present (last saved 5 Oct). Newer H3 workflows exist too: H3ultRefsTest3, H3ultSingleRef, H3ultSingleRefSparse, H3ult_Solenne_v3–v5 and H3ult_Xiaoyu_v1–v3.
+
+What a manifest is: for one saved workflow, it lists which values the studio may change per job (prompt, reference images, seed, duration, output path) and declares every other value to be yours. It also records how long the configuration takes and how much VRAM it needs. Only workflows with a manifest can be used by the studio.
+
+The newer files compared with H3ultRefsTest2 (a read-only diff of node modes and values):
+
+| Workflow | Differs from H3ultRefsTest2 in | Is it a new configuration? |
+| --- | --- | --- |
+| H3ultRefsTest3 | duration 7 s, other reference images, output path | No: same configuration, different per-job values |
+| H3ultSingleRef | 1 reference (235/236 removed), 12 s | Only the reference count |
+| H3ultSingleRefSparse | 1 reference, 14 s, BlockSparseAttention (sol-attn) on, LowVRAM attention and chunked feed-forward off | Yes: a different memory/attention setup |
+| H3ult_Solenne_v5 | as SingleRefSparse, plus the pruned int8 model (`minimax_h3_fl2va_pruned_int8_convrot`), 1.4 MP, 16 s | Yes: another model file and resolution |
+| H3ult_Xiaoyu_v3_textcats | as Solenne_v5, plus one more VRAM_Debug (237) | Same as Solenne_v5 |
+
+The three named workflows also differ from each other in their memory setup: H3regenrunsTest runs with the Sage patches (153 and 159 on), and H3ultRefsTest2 with kitchen attention, chunked feed-forward and LowVRAM attention. Both have the live preview node (152 ModelPreviewOverrideKJ with taeh3), which is what you watch.
+
+Points for you:
+- The newest setup turns BlockSparseAttention (sol-attn) on. Standing rule 1 in h3-gacha-pipeline says not to use sol-attn for high-motion work. Which one is current?
+- The newest setup has no measured time or VRAM peak in the docs. Today's ComfyUI logs show two runs with the pruned model (17:40 and 17:45). Neither finished: the first was interrupted, and the second log stops after the model load, before ComfyUI was restarted at 18:00.
+- A manifest is per configuration, not per file: the H3ultRefsTest3 and SingleRef files would be jobs on an existing manifest, not new workflows.
+- *Recommendation:* in step 6, write manifests for H3regensElements, H3regenrunsTest and H3ultRefsTest2 as KICKOFF says, plus H3ult_Xiaoyu_v3_textcats as the newest setup if you use it for production. Each new configuration is marked unmeasured until a smoke test in an approved window measures it.
 
 **I. ComfyUI launcher.** It is `C:\Users\david\Desktop\ComfyUI.bat`: vcvars64, then `C:\CUVenv`, then `python main.py --cuda-device 0 --disable-pinned-memory --disable-comfy-compiler`. Other launchers sit next to it (ComfyUINSFW.bat, "ComfyUI - LTX2.bat" and others), and a restart always reopens with ComfyUI.bat.
 *Proposal:* at the start of a window the watchdog compares the running ComfyUI's command line with ComfyUI.bat's and warns you if they differ. "Close ComfyUI" means the python.exe listening on 8188 plus its parent cmd.exe console, and nothing else.
 
 **J. Skills.**
 - The design lists h3-prompting, krea-sheets, comfy-bridge, vram-watch, studio-conventions and video-use; four skills exist today.
-- *Proposal:* port the four under their current names, and add studio-conventions (step 2), comfy-bridge (step 6) and vram-watch (step 7). Splitting h3-gacha-pipeline into h3-prompting and krea-sheets waits until the Prompt Writer and the Asset Designer first run; until then they preload h3-gacha-pipeline.
+- *Approved 2026-10-09:* port the four under their current names, and add studio-conventions (step 2), comfy-bridge (step 6) and vram-watch (step 7). Splitting h3-gacha-pipeline into h3-prompting and krea-sheets waits until the Prompt Writer and the Asset Designer first run; until then they preload h3-gacha-pipeline.
 - video-use is already installed for your user at `~\.claude\skills\video-use`, with its own venv and `.env`. Agents preload it by name; it is not copied into the repo.
 - The same four skills also exist as claude.ai account skills (`anthropic-skills:…`), which keep the cloud environment sections. Studio agents preload the project copies by name. In the main session, both copies are visible.
 
@@ -165,8 +189,8 @@ Plus `bridge/comfy_api.py` (status, queue, history, free, outputs, logs; no subm
 Your "OK" accepts the proposals as written. Change any of them by number:
 
 1. ~~Studio venv at `.venv`, light packages now (3.A).~~ Approved.
-2. ~~Approval policy (3.F).~~ Decided. Still open: the safety rule for stills (only when ComfyUI is idle, one at a time).
-3. The write allowlist plus scratch and memory folders (3.G).
-4. A dedicated studio ComfyUI tab (3.D). Jobs run in that tab, so that is where you watch progress and the preview node. The alternative is your own tab, with the unsaved-edit check before each reload.
-5. Only the three named workflows (3.H).
-6. Port four skills now; the h3 split later (3.J).
+2. ~~Approval policy (3.F).~~ Decided: you define it per project at intake.
+3. ~~The write allowlist plus scratch and memory folders (3.G).~~ Approved.
+4. ~~A dedicated studio ComfyUI tab (3.D).~~ Approved. Jobs run in that tab, so that is where you watch progress and the preview node.
+5. Which workflows get manifests (3.H): open.
+6. ~~Port four skills now; the h3 split later (3.J).~~ Approved.
